@@ -17,13 +17,13 @@ export const startNotificationWorker = async () => {
       const html = await renderTemplate(data.templateName, data);
       await transporter.sendMail({
         from: `"No Reply" <${process.env.SMTP_USER}>`,
-        to: data.user.email,
+        to: data?.user?.email || data.payload.email,
         subject: data.subject || "Notification",
         html,
       });
     }
     if (data.type === "sms") {
-      await sendSMS(data.user.mobile_number, "Signup", data.templateId);
+      await sendSMS(data?.user?.mobile_number, "Signup", data.templateId);
     }
     // push & inapp can go here
   }
@@ -35,7 +35,7 @@ export const startNotificationWorker = async () => {
   try {
     const existing = await Notification.findById(data.notificationId);
     if (!existing) {
-      data.userId = data.user._id;
+      data.userId = data?.user?._id;
       await Notification.create({ ...data, _id: data.notificationId });
     }
 
@@ -45,6 +45,10 @@ export const startNotificationWorker = async () => {
       status: "sent",
       attempts,
     });
+     if (!global.fastify?.io) {
+          return errorResponse(reply, "Socket.IO not initialized", 500);
+    }
+    data?.user && global.fastify.io.to(`user:${data?.user?._id}`).emit("notification", payload); //
 
     ch.ack(msg);
   } catch (err) {

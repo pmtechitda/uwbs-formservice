@@ -4,7 +4,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 import { getTemplateText } from '../utils/smsTemplate.js'
 
-export const sendSMS = async ({ phone, content,templateId }) => {
+export const sendSMS = async ( phone, content,templateId ) => {
   try {
     const sender = 'UKITDA'
     const username = process.env.HMIMEDIA_SMS_API_USERNAME

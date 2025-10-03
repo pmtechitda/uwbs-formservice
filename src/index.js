@@ -10,7 +10,6 @@ import ajvErrors from "ajv-errors";
 import pointOfView from "point-of-view";
 import ejs from "ejs";
 import { startNotificationWorker } from "./worker/index.js";
-import { transporter } from "./services/mailService.js";
 dotenv.config();
 
 const fastify = Fastify({ logger: true,

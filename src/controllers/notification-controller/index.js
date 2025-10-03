@@ -76,7 +76,6 @@ export const getAllNotification = async (req, reply) => {
     return errorResponse(reply, "Failed to send notification", 500, error);
   }
 };
-
 // Emit real-time notification via Socket.IO
 export const emitNotification = async (req, reply) => {
   try {
