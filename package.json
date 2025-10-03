@@ -1,0 +1,30 @@
+{
+  "name": "uwbs-notificationservice",
+  "version": "1.0.0",
+  "description": "Provides notification for the system",
+  "license": "ISC",
+  "author": "Suraj Chauhan",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "worker": "nodemon src/worker/index.js"
+  },
+  "dependencies": {
+    "ajv-errors": "^3.0.0",
+    "amqplib": "^0.10.3",
+    "axios": "^1.6.8",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "fastify": "^4.29.1",
+    "fastify-socket.io": "^5.1.0",
+    "handlebars": "^4.7.8",
+    "mongoose": "^8.3.1",
+    "nodemailer": "^7.0.6",
+    "point-of-view": "^6.3.0",
+    "redis": "^4.7.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
