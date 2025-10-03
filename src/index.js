@@ -28,7 +28,7 @@ await fastify.register(fastifyIO, { cors: { origin: "*" } });
 fastify.io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
 
-  socket.on("register", ({ userId }) => {
+  socket.on("login", ({ userId }) => {
     socket.join(`user:${userId}`);
     console.log(`User ${userId} joined room user:${userId}`);
   });
