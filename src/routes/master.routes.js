@@ -1,6 +1,6 @@
-// routes/master.routes.js
-import notification from './notification-routes/notification.route.js';
-
+import meterReplacement from './meter-replacement-routes/index.js'
+import reconnection from './reconnection-routes/index.js'
+import tanker from './tanker-routes/index.js'
 async function masterRoutes(fastify, opts) {
   const authRoute = (schema = {}, tag = 'Misc') => ({
     preHandler: [fastify.authenticate],
@@ -11,7 +11,9 @@ async function masterRoutes(fastify, opts) {
     },
   });
 
-  await fastify.register(notification, { authRoute });
+  await fastify.register(meterReplacement, { authRoute });
+  await fastify.register(reconnection, { authRoute });
+  await fastify.register(tanker, { authRoute });
 }
 
 export default masterRoutes;
