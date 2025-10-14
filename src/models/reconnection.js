@@ -1,65 +1,25 @@
 import mongoose from "mongoose";
+const { Schema, Types } = mongoose;
 
 const reconnectionSchema = new mongoose.Schema(
   {
-    consumerNumber: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    nameOfApplicant: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    fatherName: {
-      type: String,
-      trim: true,
-    },
-    connectionNumber: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    mobileNumber: {
-      type: String,
-      required: true,
-      match: [/^[0-9]{10}$/, "Invalid mobile number"],
-    },
-    permanentAddress: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    relationType: {
-      type: String,
-      enum: ["Owner", "Tenant", "Family", "Other"],
-      default: "Owner",
-    },
-    mutationReason: {
-      type: String,
-      trim: true,
-    },
-    ownershipStatus: {
-      type: String,
-      enum: ["Owned", "Rented", "Leased", "Other"],
-      default: "Owned",
-    },
-    identityFile: {
-      type: String,
+    consumer_id: {
+      type: Types.ObjectId,
       required: true,
     },
-    officialId: {
-      type: String,
-      required: true,
-    },
-    photo: {
+    reason: {
       type: String,
       required: false,
+      trim: true,
     },
-    signature: {
+    photo_id: {
+      type: Types.ObjectId,
+      required: true,
+    },
+    status: {
       type: String,
-      required: false,
+      enum: ["Approve", "Pending", "Draft"],
+      default: "Approve",
     },
   },
   {
