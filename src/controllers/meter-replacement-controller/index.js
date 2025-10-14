@@ -1,36 +1,48 @@
 import MeterReplacement from '../../models/meterReplacement.js';
 import { successResponse, errorResponse } from "../../utils/response.util.js";
 
+/**
+ * Build MongoDB filter for MeterReplacement listing
+ */
 const buildFilter = (query) => {
-  const { consumerNumber, mobileNumber, ownershipStatus, search } = query;
-
+  const { consumer_id, status, search } = query;
   const filter = {};
 
-  if (consumerNumber) filter.consumerNumber = { $regex: consumerNumber, $options: 'i' };
-  if (mobileNumber) filter.mobileNumber = mobileNumber;
-  if (ownershipStatus && ownershipStatus !== 'All') filter.ownershipStatus = ownershipStatus;
+  if (consumer_id) {
+    filter.consumer_id = consumer_id;
+  }
+
+  if (status && status !== 'All') {
+    filter.status = status;
+  }
 
   if (search) {
-    filter.$or = [
-      { consumerNumber: { $regex: search, $options: 'i' } },
-      { nameOfApplicant: { $regex: search, $options: 'i' } },
-      { connectionNumber: { $regex: search, $options: 'i' } },
-      { mobileNumber: { $regex: search, $options: 'i' } },
-    ];
+    // Search only in "reason" for now — can be extended
+    filter.$or = [{ reason: { $regex: search, $options: 'i' } }];
   }
 
   return filter;
 };
 
+/**
+ * Get all meter replacements with pagination
+ */
 export const getAllMeterReplacements = async (req, reply) => {
   try {
-    const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
-    const filter = buildFilter(req.query);
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+    } = req.query;
 
+    const filter = buildFilter(req.query);
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const total = await MeterReplacement.countDocuments(filter);
     const meterReplacements = await MeterReplacement.find(filter)
+      .populate('consumer_id', 'name email') // optional: show user info
+      .populate('photo_id', 'name email') // optional
       .skip(skip)
       .limit(parseInt(limit))
       .sort({ [sortBy]: sortOrder === 'asc' ? 1 : -1 });
@@ -53,52 +65,83 @@ export const getAllMeterReplacements = async (req, reply) => {
   }
 };
 
+/**
+ * Get single meter replacement by ID
+ */
 export const getMeterReplacementById = async (req, reply) => {
   try {
     const { id } = req.params;
-    const record = await MeterReplacement.findById(id);
+    const record = await MeterReplacement.findById(id)
+      .populate('consumer_id', 'name email')
+      .populate('photo_id', 'name email');
+
     if (!record) {
       return errorResponse(reply, 'Meter replacement not found', 404);
     }
+
     return successResponse(reply, record, 'Meter replacement fetched successfully');
   } catch (error) {
     return errorResponse(reply, 'Failed to fetch meter replacement', 500, error);
   }
 };
 
+/**
+ * Create new meter replacement
+ */
 export const createMeterReplacement = async (req, reply) => {
   try {
-    const newRecord = new MeterReplacement(req.body);
-    await newRecord.save();
-    return successResponse(reply, null, 'Meter replacement created successfully');
+    const { consumer_id, reason, photo_id, status } = req.body;
+
+    const newRecord = new MeterReplacement({
+      consumer_id,
+      reason,
+      photo_id,
+      status,
+    });
+
+    const savedRecord = await newRecord.save();
+
+    return successResponse(reply, savedRecord, 'Meter replacement created successfully');
   } catch (error) {
     return errorResponse(reply, 'Failed to create meter replacement', 500, error);
   }
 };
 
+/**
+ * Update meter replacement by ID
+ */
 export const updateMeterReplacement = async (req, reply) => {
   try {
     const { id } = req.params;
+
     const updatedRecord = await MeterReplacement.findByIdAndUpdate(id, req.body, {
       new: true,
       runValidators: true,
     });
+
     if (!updatedRecord) {
       return errorResponse(reply, 'Meter replacement not found', 404);
     }
+
     return successResponse(reply, updatedRecord, 'Meter replacement updated successfully');
   } catch (error) {
     return errorResponse(reply, 'Failed to update meter replacement', 500, error);
   }
 };
 
+/**
+ * Delete meter replacement by ID
+ */
 export const deleteMeterReplacement = async (req, reply) => {
   try {
     const { id } = req.params;
+
     const deletedRecord = await MeterReplacement.findByIdAndDelete(id);
+
     if (!deletedRecord) {
       return errorResponse(reply, 'Meter replacement not found', 404);
     }
+
     return successResponse(reply, null, 'Meter replacement deleted successfully');
   } catch (error) {
     return errorResponse(reply, 'Failed to delete meter replacement', 500, error);
