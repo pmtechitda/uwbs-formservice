@@ -1,6 +1,6 @@
 const reconnectionSchema = {
   createReconnectionSchema: {
-    tags: ["Reconnection"],
+    tags: ["Reconnection/Disconnection Service"],
     body: {
       type: "object",
       required: [
@@ -11,6 +11,7 @@ const reconnectionSchema = {
         "permanentAddress",
         "identityFile",
         "officialId",
+        
       ],
       properties: {
         consumerNumber: { type: "string", minLength: 1 },
@@ -33,6 +34,11 @@ const reconnectionSchema = {
           enum: ["Owned", "Rented", "Leased", "Other"],
           default: "Owned",
         },
+        serviceType: {
+          type: "string",
+          enum: ["Reconnection", "Disconnection"],
+          default: null,
+        },
         identityFile: { type: "string" },
         officialId: { type: "string" },
         photo: { type: "string" },
@@ -45,8 +51,10 @@ const reconnectionSchema = {
           connectionNumber: "Connection Number is required",
           mobileNumber: "Mobile Number is required",
           permanentAddress: "Permanent Address is required",
+          serviceType: "Service Type is required",
           identityFile: "Identity File is required",
           officialId: "Official Id is required",
+          
         },
         properties: {
           mobileNumber: "Mobile number must be 10 digits",
@@ -71,6 +79,7 @@ const reconnectionSchema = {
               relationType: { type: "string" },
               mutationReason: { type: "string" },
               ownershipStatus: { type: "string" },
+              serviceType: { type: "string" },
               identityFile: { type: "string" },
               officialId: { type: "string" },
               photo: { type: "string" },
@@ -84,7 +93,7 @@ const reconnectionSchema = {
   },
 
   getReconnectionByIdSchema: {
-    tags: ["Reconnection"],
+    tags: ["Reconnection/Disconnection Service"],
     params: {
       type: "object",
       required: ["id"],
@@ -115,10 +124,14 @@ const reconnectionSchema = {
               relationType: { type: "string" },
               mutationReason: { type: "string" },
               ownershipStatus: { type: "string" },
+              serviceType: { type: "string" },
               identityFile: { type: "string" },
               officialId: { type: "string" },
               photo: { type: "string" },
               signature: { type: "string" },
+              previousAmount: { type: "string" },
+              charges: { type: "string" },
+              totalAmount: { type: "string" },
               createdAt: { type: "string", format: "date-time" },
               updatedAt: { type: "string", format: "date-time" },
             },
@@ -129,7 +142,7 @@ const reconnectionSchema = {
   },
 
   getAllReconnectionSchema: {
-    tags: ["Reconnection"],
+    tags: ["Reconnection/Disconnection Service"],
     querystring: {
       type: "object",
       properties: {
@@ -143,6 +156,7 @@ const reconnectionSchema = {
         sortOrder: { type: "string", enum: ["asc", "desc"], default: "desc" },
         consumerNumber: { type: "string" },
         mobileNumber: { type: "string", pattern: "^[0-9]{10}$" },
+        serviceType:{type:"string", enum:["Reconnection", "Disconnection","All"]}
       },
       additionalProperties: true,
       errorMessage: {
@@ -175,6 +189,10 @@ const reconnectionSchema = {
                     connectionNumber: { type: "string" },
                     mobileNumber: { type: "string" },
                     ownershipStatus: { type: "string" },
+                    serviceType: { type: "string" },
+                    previousAmount: { type: "string" },
+                    charges: { type: "string" },
+                    totalAmount: { type: "string" },
                     createdAt: { type: "string", format: "date-time" },
                   },
                 },
@@ -196,7 +214,7 @@ const reconnectionSchema = {
   },
 
   updateReconnectionSchema: {
-    tags: ["Reconnection"],
+    tags: ["Reconnection/Disconnection Service"],
     params: {
       type: "object",
       required: ["id"],
@@ -222,10 +240,18 @@ const reconnectionSchema = {
           type: "string",
           enum: ["Owned", "Rented", "Leased", "Other"],
         },
+        serviceType: {
+          type: "string",
+          enum: ["Reconnection", "Disconnection"],
+          default: null,
+        },
         identityFile: { type: "string" },
         officialId: { type: "string" },
         photo: { type: "string" },
         signature: { type: "string" },
+        previousAmount: { type: "string" },
+        charges: { type: "string" },
+        totalAmount: { type: "string" },
       },
       additionalProperties: false,
     },
@@ -239,6 +265,9 @@ const reconnectionSchema = {
             type: "object",
             properties: {
               _id: { type: "string" },
+              previousAmount: { type: "string" },
+              charges: { type: "string" },
+              totalAmount: { type: "string" },
               updatedAt: { type: "string", format: "date-time" },
             },
           },
@@ -248,7 +277,7 @@ const reconnectionSchema = {
   },
 
   deleteReconnectionSchema: {
-    tags: ["Reconnection"],
+    tags: ["Reconnection/Disconnection Service"],
     params: {
       type: "object",
       required: ["id"],
