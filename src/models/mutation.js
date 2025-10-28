@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const reconnectionSchema = new mongoose.Schema(
+const mutationSchema = new mongoose.Schema(
   {
     consumerNumber: {
       type: String,
@@ -31,24 +31,18 @@ const reconnectionSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    relationType: {
-      type: String,
-      enum: ["Owner", "Tenant", "Family", "Other"],
-      default: "Owner",
-    },
     mutationReason: {
       type: String,
       trim: true,
     },
     ownershipStatus: {
       type: String,
-      enum: ["Owned", "Rented", "Leased", "Other"],
-      default: "Owned",
+      enum: ["Owner", "Tenant"],
+      default: "Owner",
     },
-    serviceType: {
+    ownershipFile: {
       type: String,
-      enum: ["Reconnection", "Disconnection"],
-      default: null,
+      required: true,
     },
     identityFile: {
       type: String,
@@ -66,18 +60,6 @@ const reconnectionSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    previousAmount: {
-      type: String,
-      required: false,
-    },
-    charges: {
-      type: String,
-      required: false,
-    },
-    totalAmount: {
-      type: String,
-      required: false,
-    },
   },
   {
     timestamps: true,
@@ -85,4 +67,4 @@ const reconnectionSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("Reconnection", reconnectionSchema);
+export default mongoose.model("Mutation", mutationSchema);
