@@ -2,14 +2,14 @@ import Reconnection from '../../models/reconnection.js';
 import { successResponse, errorResponse } from "../../utils/response.util.js";
 
 const buildFilter = (query) => {
-  const { consumerNumber, mobileNumber, ownershipStatus, search } = query;
+  const { consumerNumber, mobileNumber, ownershipStatus, serviceType, search } = query;
 
   const filter = {};
 
   if (consumerNumber) filter.consumerNumber = { $regex: consumerNumber, $options: 'i' };
   if (mobileNumber) filter.mobileNumber = mobileNumber;
   if (ownershipStatus && ownershipStatus !== 'All') filter.ownershipStatus = ownershipStatus;
-
+  if (serviceType && serviceType !== 'All') filter.serviceType = serviceType;
   if (search) {
     filter.$or = [
       { consumerNumber: { $regex: search, $options: 'i' } },

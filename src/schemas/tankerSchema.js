@@ -1,6 +1,6 @@
 const tankerSchema = {
   createTankerSchema: {
-    tags: ["Tanker"],
+    tags: ["Tanker Service"],
     body: {
       type: "object",
       required: [
@@ -84,7 +84,7 @@ const tankerSchema = {
   },
 
   getTankerByIdSchema: {
-    tags: ["Tanker"],
+    tags: ["Tanker Service"],
     params: {
       type: "object",
       required: ["id"],
@@ -129,7 +129,7 @@ const tankerSchema = {
   },
 
   getAllTankerSchema: {
-    tags: ["Tanker"],
+    tags: ["Tanker Service"],
     querystring: {
       type: "object",
       properties: {
@@ -196,7 +196,7 @@ const tankerSchema = {
   },
 
   updateTankerSchema: {
-    tags: ["Tanker"],
+    tags: ["Tanker Service"],
     params: {
       type: "object",
       required: ["id"],
@@ -248,7 +248,7 @@ const tankerSchema = {
   },
 
   deleteTankerSchema: {
-    tags: ["Tanker"],
+    tags: ["Tanker Service"],
     params: {
       type: "object",
       required: ["id"],
