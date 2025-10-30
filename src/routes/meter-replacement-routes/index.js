@@ -1,6 +1,7 @@
 // routes/meterReplacement.routes.js
 import meterReplacementSchema from '../../schemas/meterReplacementSchema.js';
 import * as controller from '../../controllers/meter-replacement-controller/index.js';
+// import formRevertSchema from '../../schemas/formRevertSchema.js';
 
 export default async function meterReplacementRoutes(fastify, opts) {
   const { authRoute } = opts;
@@ -34,4 +35,11 @@ export default async function meterReplacementRoutes(fastify, opts) {
     authRoute(meterReplacementSchema.deleteMeterReplacementSchema, 'Meter Replacement'),
     controller.deleteMeterReplacement
   );
+
+  fastify.patch(
+    '/meter-replacements/forward-revert/:id',
+    authRoute(meterReplacementSchema.forwardRevertMeterReplacementSchema, 'Meter Replacement'),
+    controller.forwardRevertMeterReplacement
+  );
+
 }

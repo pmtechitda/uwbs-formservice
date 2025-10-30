@@ -17,10 +17,19 @@ const meterReplacementSchema = new Schema(
       type: Types.ObjectId,
       required: true,
     },
+    assignedTo: {
+      type: String,
+      required: false,
+    },
+    submittedBy: {
+      type: String,
+      required: false,
+    },
+   
     status: {
       type: String,
-      enum: ["Approve", "Pending", "Draft"],
-      default: "Approve",
+      enum: ["Approved","Rejected", "Pending", "Draft"],
+      default: "Draft",
     },
   },
   {

@@ -270,6 +270,109 @@ const tankerSchema = {
       },
     },
   },
+
+  forwardRevertTankerSchema: {
+    tags: ["Tanker"],
+    params: {
+      type: "object",
+      required: ["id"],
+      properties: {
+        id: {
+          type: "string",
+          pattern: "^[0-9a-fA-F]{24}$",
+        },
+      },
+    },
+    body: {
+      type: "object",
+      required: ["formName", "status"],
+      properties: {
+        formName: {
+          type: "string",
+          enum: [
+            "reconnection",
+            "disconnection",
+            "mutation",
+            "tanker",
+            "meter_replacement"
+          ],
+        },
+        old_user_id: {
+          type: "string",
+          pattern: "^[0-9a-fA-F]{24}$",
+        },
+        new_user_id: {
+          type: "string",
+          pattern: "^[0-9a-fA-F]{24}$",
+        },
+        comment: { type: "string", default: "" },
+        assign_to: {
+          type: "string",
+          pattern: "^[0-9a-fA-F]{24}$",
+        },
+        status: {
+          type: "string",
+          enum: ["Forward", "Revert"],
+        },
+      },
+      errorMessage: {
+        required: {
+          formName: "Form Name is required",
+          assign_to: "Assign To is required",
+          status: "Status is required"
+        },
+        properties: {
+          old_user_id: "Invalid Old User ID format (must be MongoDB ObjectId)",
+          new_user_id: "Invalid New User ID format (must be MongoDB ObjectId)",
+          assign_to: "Invalid Assign To format (must be MongoDB ObjectId)"
+        },
+      },
+    },
+    response: {
+      200: {
+        type: "object",
+        properties: {
+          success: { type: "boolean" },
+          message: { type: "string" },
+          data: {
+            type: "object",
+            properties: {
+              tanker: {
+                type: "object",
+                properties: {
+                  _id: { type: "string" },
+                  consumerNumber: { type: "string" },
+                  nameOfApplicant: { type: "string" },
+                  connectionNumber: { type: "string" },
+                  mobileNumber: { type: "string" },
+                  assignedTo: { type: "string" },
+                  status: { type: "string" },
+                  createdAt: { type: "string", format: "date-time" },
+                  updatedAt: { type: "string", format: "date-time" },
+                },
+              },
+              track: {
+                type: "object",
+                properties: {
+                  _id: { type: "string" },
+                  form_id: { type: "string" },
+                  formName: { type: "string" },
+                  old_user_id: { type: "string" },
+                  new_user_id: { type: "string" },
+                  comment: { type: "string" },
+                  submitted_by: { type: "string" },
+                  assign_to: { type: "string" },
+                  status: { type: "string" },
+                  createdAt: { type: "string", format: "date-time" },
+                  updatedAt: { type: "string", format: "date-time" },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
 };
 
 export default tankerSchema;
