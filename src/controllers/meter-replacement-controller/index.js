@@ -1,6 +1,6 @@
 import MeterReplacement from '../../models/meterReplacement.js';
 import { successResponse, errorResponse } from "../../utils/response.util.js";
-
+import FormTrack from '../../models/formTrack.js';
 /**
  * Build MongoDB filter for MeterReplacement listing
  */
@@ -147,3 +147,155 @@ export const deleteMeterReplacement = async (req, reply) => {
     return errorResponse(reply, 'Failed to delete meter replacement', 500, error);
   }
 };
+
+export const forwardRevertMeterReplacement = async (req, reply) => {
+  try {
+    const meterReplacementId = req.params.id;
+    const { assign_to, status, comment, formName } = req.body;
+
+    // Get current meter replacement to know the current assignedTo
+    const currentMeterReplacement = await MeterReplacement.findById(meterReplacementId);
+    
+    if (!currentMeterReplacement) {
+      return errorResponse(reply, 'Meter Replacement not found', 404);
+    }
+
+    let newAssignedTo;
+    let oldUserId = currentMeterReplacement.assignedTo; // This is the current owner
+    let newUserId;
+
+    if (status === "Forward") {
+      // For Forward: assign to the new user provided in assign_to
+      newAssignedTo = assign_to;
+      newUserId = assign_to;
+      
+    } else if (status === "Revert") {
+      // For Revert: fetch the last track record to get previous user
+      const lastTrackRecord = await FormTrack.findOne({
+        form_id: meterReplacementId
+      }).sort({ createdAt: -1 });
+      
+      console.log("lastTrackRecord", lastTrackRecord);
+      
+      if (!lastTrackRecord) {
+        return errorResponse(reply, 'No previous track record found to revert', 404);
+      }
+
+      // Revert to the old_user_id from the last record
+      newAssignedTo = lastTrackRecord.old_user_id;
+      newUserId = lastTrackRecord.old_user_id;
+      
+      if (!newAssignedTo) {
+        return errorResponse(reply, 'Unable to determine previous user for revert', 400);
+      }
+    }
+
+    // Update the assignedTo field in the MeterReplacement model
+    const updatedMeterReplacement = await MeterReplacement.findByIdAndUpdate(
+      meterReplacementId,
+      { assignedTo: newAssignedTo },
+      { new: true, runValidators: true }
+    );
+
+    // Create the tracking record
+    const newRecord = new FormTrack({
+      form_id: meterReplacementId,
+      formName,
+      old_user_id: oldUserId,              // ✅ Current owner (from MeterReplacement)
+      new_user_id: newUserId,              // ✅ New owner (where it's going)
+      assign_to: newAssignedTo,            // ✅ Same as new_user_id
+      comment: comment || "",
+      status,
+      submitted_by: req.user._id           // ✅ Who performed the action
+    });
+    await newRecord.save();
+
+    return successResponse(
+      reply,
+      {
+        meterReplacement: updatedMeterReplacement,
+        track: newRecord
+      },
+      status === "Revert" 
+        ? 'Meter replacement reverted successfully' 
+        : 'Meter replacement forwarded successfully'
+    );
+  } catch (error) {
+    return errorResponse(reply, 'Failed to update meter replacement', 500, error);
+  }
+};
+
+// export const forwardRevertMeterReplacement = async (req, reply) => {
+//   try {
+//     const meterReplacementId = req.params.id;
+//     const { assign_to, status, comment, formName } = req.body;
+
+//     // Get current meter replacement to know the current assignedTo
+//     const currentMeterReplacement = await MeterReplacement.findById(meterReplacementId);
+    
+//     if (!currentMeterReplacement) {
+//       return errorResponse(reply, 'Meter Replacement not found', 404);
+//     }
+
+//     let newAssignedTo;
+//     let oldUserId = currentMeterReplacement.assignedTo;
+//     let newUserId;
+
+//     if (status === "Forward") {
+//       // For Forward: assign to the new user provided in assign_to
+//       newAssignedTo = assign_to;
+//       newUserId = assign_to;
+      
+//     } else if (status === "Revert") {
+//       // For Revert: fetch the last track record to get previous user
+//       const lastTrackRecord = await FormTrack.findOne({
+//         form_id: meterReplacementId
+//       }).sort({ createdAt: -1 })
+//       console.log("lastTrackRecord",lastTrackRecord);
+//       if (!lastTrackRecord) {
+//         return errorResponse(reply, 'No previous track record found to revert', 404);
+//       }
+
+//       // Revert to the old_user_id from the last record
+//       newAssignedTo = lastTrackRecord.old_user_id;
+//       newUserId = lastTrackRecord.old_user_id;
+      
+//       if (!newAssignedTo) {
+//         return errorResponse(reply, 'Unable to determine previous user for revert', 400);
+//       }
+//     }
+
+//     // Update the assignedTo field in the MeterReplacement model
+//     const updatedMeterReplacement = await MeterReplacement.findByIdAndUpdate(
+//       meterReplacementId,
+//       { assignedTo: newAssignedTo },
+//       { new: true, runValidators: true }
+//     );
+
+//     // Create the tracking record
+//     const newRecord = new FormTrack({
+//       form_id: meterReplacementId,
+//       formName,
+//       old_user_id: req.user._id,
+//       new_user_id: newUserId,
+//       assign_to: newAssignedTo,
+//       comment: comment || "",
+//       status,
+//       submitted_by: req.user._id
+//     });
+//     await newRecord.save();
+
+//     return successResponse(
+//       reply,
+//       {
+//         meterReplacement: updatedMeterReplacement,
+//         track: newRecord
+//       },
+//       status === "Revert" 
+//         ? 'Meter replacement reverted successfully' 
+//         : 'Meter replacement forwarded successfully'
+//     );
+//   } catch (error) {
+//     return errorResponse(reply, 'Failed to update meter replacement', 500, error);
+//   }
+// };

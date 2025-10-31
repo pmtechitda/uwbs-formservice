@@ -1,6 +1,8 @@
 // routes/meterReplacement.routes.js
 import tankerSchema from '../../schemas/tankerSchema.js';
 import * as controller from '../../controllers/tanker/index.js';
+import formRevertSchema from '../../schemas/formRevertSchema.js';
+
 
 export default async function TankerRoutes(fastify, opts) {
   const { authRoute } = opts;
@@ -33,5 +35,11 @@ export default async function TankerRoutes(fastify, opts) {
     '/tanker/:id',
     authRoute(tankerSchema.deleteTankerSchema, 'Tanker'),
     controller.deleteTanker
+  );
+
+  fastify.patch(
+    '/tanker/forward-revert/:id',
+    authRoute(tankerSchema.forwardRevertTankerSchema, 'Tanker'),
+    controller.forwardRevertTanker
   );
 }
