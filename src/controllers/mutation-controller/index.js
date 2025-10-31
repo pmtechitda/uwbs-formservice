@@ -1,5 +1,6 @@
 import Mutation from '../../models/mutation.js';
 import { successResponse, errorResponse } from "../../utils/response.util.js";
+import FormTrack from '../../models/formTrack.js';
 
 const buildFilter = (query) => {
   const { consumerNumber, mobileNumber, ownershipStatus, search } = query;
@@ -100,5 +101,72 @@ export const deleteMutation = async (req, reply) => {
     return successResponse(reply, null, 'Mutation deleted successfully');
   } catch (error) {
     return errorResponse(reply, 'Failed to delete mutation', 500, error);
+  }
+};
+
+export const forwardRevertMutation = async (req, reply) => {
+  try {
+    const mutationId = req.params.id;
+    const { assign_to, status, comment, formName } = req.body;
+
+    const currentMutation = await Mutation.findById(mutationId);
+    if (!currentMutation) {
+      return errorResponse(reply, 'Mutation not found', 404);
+    }
+
+    let newAssignedTo;
+    let oldUserId = currentMutation.assignedTo;
+    let newUserId;
+
+    if (status === "Forward") {
+      newAssignedTo = assign_to;
+      newUserId = assign_to;
+    } else if (status === "Revert") {
+      const lastTrackRecord = await FormTrack.findOne({
+        form_id: mutationId
+      }).sort({ createdAt: -1 });
+
+      if (!lastTrackRecord) {
+        return errorResponse(reply, 'No previous track record found to revert', 404);
+      }
+
+      newAssignedTo = lastTrackRecord.old_user_id;
+      newUserId = lastTrackRecord.old_user_id;
+
+      if (!newAssignedTo) {
+        return errorResponse(reply, 'Unable to determine previous user for revert', 400);
+      }
+    }
+
+    const updatedMutation = await Mutation.findByIdAndUpdate(
+      mutationId,
+      { assignedTo: newAssignedTo },
+      { new: true, runValidators: true }
+    );
+
+    const newRecord = new FormTrack({
+      form_id: mutationId,
+      formName,
+      old_user_id: oldUserId,
+      new_user_id: newUserId,
+      assign_to: newAssignedTo,
+      comment: comment || "",
+      status,
+      submitted_by: req.user._id
+    });
+    await newRecord.save();
+
+    return successResponse(
+      reply,
+      {
+        mutation: updatedMutation,
+        track: newRecord
+      },
+      status === "Revert"
+        ? 'Mutation reverted successfully'
+        : 'Mutation forwarded successfully'
+    );
+  } catch (error) {
+    return errorResponse(reply, 'Failed to revert mutation', 500, error);
   }
 };

@@ -60,6 +60,20 @@ const mutationSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    assignedTo: {
+      type: String,
+      required: false,
+    },
+    submittedBy: {
+      type: String,
+      required: false,
+    },
+   
+    status: {
+      type: String,
+      enum: ["Approved","Rejected", "Pending", "Draft"],
+      default: "Draft",
+    },
   },
   {
     timestamps: true,

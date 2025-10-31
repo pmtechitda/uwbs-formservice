@@ -1,6 +1,6 @@
 import Tanker from '../../models/tanker.js';
 import { successResponse, errorResponse } from "../../utils/response.util.js";
-
+import FormTrack from '../../models/formTrack.js';
 const buildFilter = (query) => {
   const { consumerNumber, mobileNumber, ownershipStatus, search } = query;
 
@@ -102,5 +102,72 @@ export const deleteTanker = async (req, reply) => {
     return successResponse(reply, null, 'Tanker deleted successfully');
   } catch (error) {
     return errorResponse(reply, 'Failed to delete tanker', 500, error);
+  }
+};
+
+export const forwardRevertTanker = async (req, reply) => {
+  try {
+    const tankerId = req.params.id;
+    const { assign_to, status, comment, formName } = req.body;
+
+    const currentTanker = await Tanker.findById(tankerId);
+    if (!currentTanker) {
+      return errorResponse(reply, 'Tanker not found', 404);
+    }
+
+    let newAssignedTo;
+    let oldUserId = currentTanker.assignedTo;
+    let newUserId;
+
+    if (status === "Forward") {
+      newAssignedTo = assign_to;
+      newUserId = assign_to;
+    } else if (status === "Revert") {
+      const lastTrackRecord = await FormTrack.findOne({
+        form_id: tankerId
+      }).sort({ createdAt: -1 });
+
+      if (!lastTrackRecord) {
+        return errorResponse(reply, 'No previous track record found to revert', 404);
+      }
+
+      newAssignedTo = lastTrackRecord.old_user_id;
+      newUserId = lastTrackRecord.old_user_id;
+
+      if (!newAssignedTo) {
+        return errorResponse(reply, 'Unable to determine previous user for revert', 400);
+      }
+    }
+
+    const updatedTanker = await Tanker.findByIdAndUpdate(
+      tankerId,
+      { assignedTo: newAssignedTo },
+      { new: true, runValidators: true }
+    );
+
+    const newRecord = new FormTrack({
+      form_id: tankerId,
+      formName,
+      old_user_id: oldUserId,
+      new_user_id: newUserId,
+      assign_to: newAssignedTo,
+      comment: comment || "",
+      status,
+      submitted_by: req.user._id
+    });
+    await newRecord.save();
+
+    return successResponse(
+      reply,
+      {
+        tanker: updatedTanker,
+        track: newRecord
+      },
+      status === "Revert"
+        ? 'Tanker reverted successfully'
+        : 'Tanker forwarded successfully'
+    );
+  } catch (error) {
+    return errorResponse(reply, 'Failed to revert tanker', 500, error);
   }
 };
