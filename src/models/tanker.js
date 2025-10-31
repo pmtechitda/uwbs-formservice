@@ -4,7 +4,7 @@ const tankerSchema = new mongoose.Schema(
   {
     consumerNumber: {
       type: String,
-      required: true,
+      
       trim: true,
     },
     nameOfApplicant: {

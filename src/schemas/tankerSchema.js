@@ -4,7 +4,6 @@ const tankerSchema = {
     body: {
       type: "object",
       required: [
-        "consumerNumber",
         "nameOfApplicant",
         "connectionNumber",
         "mobileNumber",
@@ -13,7 +12,6 @@ const tankerSchema = {
         "officialId",
       ],
       properties: {
-        consumerNumber: { type: "string", minLength: 1 },
         nameOfApplicant: { type: "string", minLength: 1 },
         fatherName: { type: "string" },
         connectionNumber: { type: "string", minLength: 1 },
@@ -40,7 +38,6 @@ const tankerSchema = {
       },
       errorMessage: {
         required: {
-          consumerNumber: "Consumer Number is required",
           nameOfApplicant: "Name of Applicant is required",
           connectionNumber: "Connection Number is required",
           mobileNumber: "Mobile Number is required",
@@ -128,6 +125,46 @@ const tankerSchema = {
     },
   },
 
+  getTankerByConsumerNumberSchema: {
+    tags: ["Tanker Service"],
+    response: {
+      200: {
+        type: "object",
+        properties: {
+          success: { type: "boolean" },
+          message: { type: "string" },
+          data: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                _id: { type: "string" },
+                consumerNumber: { type: "string" },
+                nameOfApplicant: { type: "string" },
+                fatherName: { type: "string" },
+                connectionNumber: { type: "string" },
+                mobileNumber: { type: "string" },
+                permanentAddress: { type: "string" },
+                relationType: { type: "string" },
+                mutationReason: { type: "string" },
+                ownershipStatus: { type: "string" },
+                identityFile: { type: "string" },
+                officialId: { type: "string" },
+                photo: { type: "string" },
+                signature: { type: "string" },
+                assignedTo: { type: "string" },
+                submittedBy: { type: "string" },
+                status: { type: "string" },
+                createdAt: { type: "string", format: "date-time" },
+                updatedAt: { type: "string", format: "date-time" },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+
   getAllTankerSchema: {
     tags: ["Tanker Service"],
     querystring: {
@@ -141,6 +178,7 @@ const tankerSchema = {
           default: "createdAt",
         },
         sortOrder: { type: "string", enum: ["asc", "desc"], default: "desc" },
+        status: { type: "string", enum: ["Approved", "Rejected", "Pending", "Draft"] },
         consumerNumber: { type: "string" },
         mobileNumber: { type: "string", pattern: "^[0-9]{10}$" },
       },
@@ -207,7 +245,6 @@ const tankerSchema = {
     body: {
       type: "object",
       properties: {
-        consumerNumber: { type: "string" },
         nameOfApplicant: { type: "string" },
         fatherName: { type: "string" },
         connectionNumber: { type: "string" },
@@ -272,7 +309,7 @@ const tankerSchema = {
   },
 
   forwardRevertTankerSchema: {
-    tags: ["Tanker"],
+    tags: ["Tanker Service"],
     params: {
       type: "object",
       required: ["id"],

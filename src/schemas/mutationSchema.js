@@ -4,7 +4,6 @@ const mutationSchemas = {
       body: {
         type: "object",
         required: [
-          "consumerNumber",
           "nameOfApplicant",
           "connectionNumber",
           "mobileNumber",
@@ -15,7 +14,6 @@ const mutationSchemas = {
           
         ],
         properties: {
-          consumerNumber: { type: "string", minLength: 1 },
           nameOfApplicant: { type: "string", minLength: 1 },
           fatherName: { type: "string" },
           connectionNumber: { type: "string", minLength: 1 },
@@ -38,7 +36,6 @@ const mutationSchemas = {
         },
         errorMessage: {
           required: {
-            consumerNumber: "Consumer Number is required",
             nameOfApplicant: "Name of Applicant is required",
             connectionNumber: "Connection Number is required",
             mobileNumber: "Mobile Number is required",
@@ -128,6 +125,45 @@ const mutationSchemas = {
       },
     },
   
+    getMutationByConsumerNumberSchema: {
+      tags: ["Mutation Service"],
+      response: {
+        200: {
+          type: "object",
+          properties: {
+            success: { type: "boolean" },
+            message: { type: "string" },
+            data: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  _id: { type: "string" },
+                  consumerNumber: { type: "string" },
+                  nameOfApplicant: { type: "string" },
+                  fatherName: { type: "string" },
+                  connectionNumber: { type: "string" },
+                  mobileNumber: { type: "string" },
+                  permanentAddress: { type: "string" },
+                  mutationReason: { type: "string" },
+                  ownershipStatus: { type: "string" },
+                  ownershipFile: { type: "string" },
+                  identityFile: { type: "string" },
+                  officialId: { type: "string" },
+                  photo: { type: "string" },
+                  signature: { type: "string" },
+                  assignedTo: { type: "string" },
+                  status: { type: "string" },
+                  createdAt: { type: "string", format: "date-time" },
+                  updatedAt: { type: "string", format: "date-time" },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+
     getAllMutationSchema: {
       tags: ["Mutation Service"],
       querystring: {
@@ -141,6 +177,7 @@ const mutationSchemas = {
             default: "createdAt",
           },
           sortOrder: { type: "string", enum: ["asc", "desc"], default: "desc" },
+        status: { type: "string", enum: ["Approved", "Rejected", "Pending", "Draft"] },
           consumerNumber: { type: "string" },
           mobileNumber: { type: "string", pattern: "^[0-9]{10}$" },
           ownershipStatus:{type:"string", enum:["Owner", "Tenant","All"]}
@@ -213,7 +250,6 @@ const mutationSchemas = {
       body: {
         type: "object",
         properties: {
-          consumerNumber: { type: "string" },
           nameOfApplicant: { type: "string" },
           fatherName: { type: "string" },
           connectionNumber: { type: "string" },
@@ -280,7 +316,7 @@ const mutationSchemas = {
     },
   
     forwardRevertMutationSchema: {
-      tags: ["Mutation"],
+      tags: ["Mutation Service"],
       params: {
         type: "object",
         required: ["id"],

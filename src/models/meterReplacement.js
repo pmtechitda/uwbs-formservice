@@ -4,9 +4,9 @@ const { Schema, Types } = mongoose;
 
 const meterReplacementSchema = new Schema(
   {
-    consumer_id: {
-      type: Types.ObjectId,
-      required: true,
+    consumerNumber: {
+      type: String,
+      trim: true,
     },
     reason: {
       type: String,
