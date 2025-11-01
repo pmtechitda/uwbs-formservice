@@ -4,7 +4,6 @@ const reconnectionSchema = {
     body: {
       type: "object",
       required: [
-        "consumerNumber",
         "nameOfApplicant",
         "connectionNumber",
         "mobileNumber",
@@ -14,7 +13,6 @@ const reconnectionSchema = {
         
       ],
       properties: {
-        consumerNumber: { type: "string", minLength: 1 },
         nameOfApplicant: { type: "string", minLength: 1 },
         fatherName: { type: "string" },
         connectionNumber: { type: "string", minLength: 1 },
@@ -46,7 +44,6 @@ const reconnectionSchema = {
       },
       errorMessage: {
         required: {
-          consumerNumber: "Consumer Number is required",
           nameOfApplicant: "Name of Applicant is required",
           connectionNumber: "Connection Number is required",
           mobileNumber: "Mobile Number is required",
@@ -141,6 +138,50 @@ const reconnectionSchema = {
     },
   },
 
+  getReconnectionByConsumerNumberSchema: {
+    tags: ["Reconnection/Disconnection Service"],
+    response: {
+      200: {
+        type: "object",
+        properties: {
+          success: { type: "boolean" },
+          message: { type: "string" },
+          data: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                _id: { type: "string" },
+                consumerNumber: { type: "string" },
+                nameOfApplicant: { type: "string" },
+                fatherName: { type: "string" },
+                connectionNumber: { type: "string" },
+                mobileNumber: { type: "string" },
+                permanentAddress: { type: "string" },
+                relationType: { type: "string" },
+                mutationReason: { type: "string" },
+                ownershipStatus: { type: "string" },
+                serviceType: { type: "string" },
+                identityFile: { type: "string" },
+                officialId: { type: "string" },
+                photo: { type: "string" },
+                signature: { type: "string" },
+                previousAmount: { type: "string" },
+                charges: { type: "string" },
+                totalAmount: { type: "string" },
+                assignedTo: { type: "string" },
+                submittedBy: { type: "string" },
+                status: { type: "string" },
+                createdAt: { type: "string", format: "date-time" },
+                updatedAt: { type: "string", format: "date-time" },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+
   getAllReconnectionSchema: {
     tags: ["Reconnection/Disconnection Service"],
     querystring: {
@@ -154,6 +195,7 @@ const reconnectionSchema = {
           default: "createdAt",
         },
         sortOrder: { type: "string", enum: ["asc", "desc"], default: "desc" },
+        status: { type: "string", enum: ["Approved", "Rejected", "Pending", "Draft"] },
         consumerNumber: { type: "string" },
         mobileNumber: { type: "string", pattern: "^[0-9]{10}$" },
         serviceType:{type:"string", enum:["Reconnection", "Disconnection","All"]}
@@ -228,7 +270,6 @@ const reconnectionSchema = {
     body: {
       type: "object",
       properties: {
-        consumerNumber: { type: "string" },
         nameOfApplicant: { type: "string" },
         fatherName: { type: "string" },
         connectionNumber: { type: "string" },
@@ -310,7 +351,7 @@ const reconnectionSchema = {
   },
   
   forwardRevertReconnectionSchema: {
-    tags: ["Reconnection"],
+    tags: ["Reconnection/Disconnection Service"],
     params: {
       type: "object",
       required: ["id"],
