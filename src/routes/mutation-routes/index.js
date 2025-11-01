@@ -1,7 +1,6 @@
 // routes/meterReplacement.routes.js
 import mutation from '../../schemas/mutationSchema.js';
 import * as controller from '../../controllers/mutation-controller/index.js';
-import formRevertSchema from '../../schemas/formRevertSchema.js';
 export default async function mutationRoutes(fastify, opts) {
   const { authRoute } = opts;
 
@@ -15,6 +14,12 @@ export default async function mutationRoutes(fastify, opts) {
     '/mutation/:id',
     authRoute(mutation.getMutationByIdSchema, 'Mutation'),
     controller.getMutationById
+  );
+
+  fastify.get(
+    '/mutation/consumerNo',
+    authRoute(mutation.getMutationByConsumerNumberSchema, 'Mutation'),
+    controller.getMutationByConsumerNumber
   );
 
   fastify.post(

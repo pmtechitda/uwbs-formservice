@@ -4,7 +4,7 @@ const mutationSchema = new mongoose.Schema(
   {
     consumerNumber: {
       type: String,
-      required: true,
+    
       trim: true,
     },
     nameOfApplicant: {

@@ -3,12 +3,8 @@ const meterReplacementSchema = {
     tags: ["Meter Replacement"],
     body: {
       type: "object",
-      required: ["consumer_id", "photo_id"],
+      required: ["photo_id"],
       properties: {
-        consumer_id: {
-          type: "string",
-          pattern: "^[0-9a-fA-F]{24}$",
-        },
         reason: { type: "string" },
         photo_id: {
           type: "string",
@@ -22,11 +18,9 @@ const meterReplacementSchema = {
       },
       errorMessage: {
         required: {
-          consumer_id: "Consumer ID is required",
           photo_id: "Photo ID is required",
         },
         properties: {
-          consumer_id: "Invalid Consumer ID format (must be MongoDB ObjectId)",
           photo_id: "Invalid Photo ID format (must be MongoDB ObjectId)",
         },
       },
@@ -41,7 +35,7 @@ const meterReplacementSchema = {
             type: "object",
             properties: {
               _id: { type: "string" },
-              consumer_id: { type: "string" },
+              consumerNumber: { type: "string" },
               reason: { type: "string" },
               photo_id: { type: "string" },
               status: { type: "string" },
@@ -77,12 +71,41 @@ const meterReplacementSchema = {
             type: "object",
             properties: {
               _id: { type: "string" },
-              consumer_id: { type: "string" },
+              consumerNumber: { type: "string" },
               reason: { type: "string" },
               photo_id: { type: "string" },
               status: { type: "string" },
               createdAt: { type: "string", format: "date-time" },
               updatedAt: { type: "string", format: "date-time" },
+            },
+          },
+        },
+      },
+    },
+  },
+
+  getMeterReplacementByConsumerNumberSchema: {
+    tags: ["Meter Replacement"],
+    response: {
+      200: {
+        type: "object",
+        properties: {
+          success: { type: "boolean" },
+          message: { type: "string" },
+          data: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                _id: { type: "string" },
+                consumerNumber: { type: "string" },
+                reason: { type: "string" },
+                photo_id: { type: "string" },
+                status: { type: "string" },
+                assignedTo: { type: "string", nullable: true }, // optional field
+                createdAt: { type: "string", format: "date-time" },
+                updatedAt: { type: "string", format: "date-time" },
+              },
             },
           },
         },
@@ -103,7 +126,10 @@ const meterReplacementSchema = {
           default: "createdAt",
         },
         sortOrder: { type: "string", enum: ["asc", "desc"], default: "desc" },
-        status: { type: "string", enum: ["Approved", "Rejected", "Pending", "Draft"] },
+        status: {
+          type: "string",
+          enum: ["Approved", "Rejected", "Pending", "Draft"],
+        },
       },
       additionalProperties: true,
       errorMessage: {
@@ -130,7 +156,7 @@ const meterReplacementSchema = {
                   type: "object",
                   properties: {
                     _id: { type: "string" },
-                    consumer_id: { type: "string" },
+                    consumerNumber: { type: "string" },
                     reason: { type: "string" },
                     photo_id: { type: "string" },
                     status: { type: "string" },
@@ -166,10 +192,6 @@ const meterReplacementSchema = {
     body: {
       type: "object",
       properties: {
-        consumer_id: {
-          type: "string",
-          pattern: "^[0-9a-fA-F]{24}$",
-        },
         reason: { type: "string" },
         photo_id: {
           type: "string",
@@ -223,7 +245,7 @@ const meterReplacementSchema = {
             "disconnection",
             "mutation",
             "tanker",
-            "meter_replacement"
+            "meter_replacement",
           ],
         },
         old_user_id: {
@@ -248,12 +270,12 @@ const meterReplacementSchema = {
         required: {
           formName: "Form Name is required",
           assign_to: "Assign To is required",
-          status: "Status is required"
+          status: "Status is required",
         },
         properties: {
           old_user_id: "Invalid Old User ID format (must be MongoDB ObjectId)",
           new_user_id: "Invalid New User ID format (must be MongoDB ObjectId)",
-          assign_to: "Invalid Assign To format (must be MongoDB ObjectId)"
+          assign_to: "Invalid Assign To format (must be MongoDB ObjectId)",
         },
       },
     },
@@ -270,7 +292,7 @@ const meterReplacementSchema = {
                 type: "object",
                 properties: {
                   _id: { type: "string" },
-                  consumer_id: { type: "string" },
+                  consumerNumber: { type: "string" },
                   reason: { type: "string" },
                   photo_id: { type: "string" },
                   assignedTo: { type: "string" },

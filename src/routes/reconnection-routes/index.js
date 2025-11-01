@@ -1,7 +1,6 @@
 // routes/meterReplacement.routes.js
 import reconnection from '../../schemas/reconnectionSchema.js';
 import * as controller from '../../controllers/reconnection-controller/index.js';
-import formRevertSchema from '../../schemas/formRevertSchema.js';
 
 
 export default async function reconnectionRoutes(fastify, opts) {
@@ -17,6 +16,12 @@ export default async function reconnectionRoutes(fastify, opts) {
     '/reconnection/:id',
     authRoute(reconnection.getReconnectionByIdSchema, 'Reconnection'),
     controller.getReconnectionById
+  );
+
+  fastify.get(
+    '/reconnection/consumerNo',
+    authRoute(reconnection.getReconnectionByConsumerNumberSchema, 'Reconnection'),
+    controller.getReconnectionByConsumerNumber
   );
 
   fastify.post(

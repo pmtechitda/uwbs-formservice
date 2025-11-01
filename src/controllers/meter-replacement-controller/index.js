@@ -1,24 +1,27 @@
-import MeterReplacement from '../../models/meterReplacement.js';
+import MeterReplacement from "../../models/meterReplacement.js";
 import { successResponse, errorResponse } from "../../utils/response.util.js";
-import FormTrack from '../../models/formTrack.js';
+import FormTrack from "../../models/formTrack.js";
 /**
  * Build MongoDB filter for MeterReplacement listing
  */
 const buildFilter = (query) => {
-  const { consumer_id, status, search } = query;
+  const { consumerNumber, status, search } = query;
   const filter = {};
 
-  if (consumer_id) {
-    filter.consumer_id = consumer_id;
+  if (consumerNumber) {
+    filter.consumerNumber = consumerNumber;
   }
 
-  if (status && status !== 'All') {
+  if (status && status !== "All") {
     filter.status = status;
   }
 
   if (search) {
     // Search only in "reason" for now — can be extended
-    filter.$or = [{ reason: { $regex: search, $options: 'i' } }];
+    filter.$or = [
+      { reason: { $regex: search, $options: "i" } },
+      { consumerNumber: { $regex: search, $options: "i" } },
+    ];
   }
 
   return filter;
@@ -32,8 +35,8 @@ export const getAllMeterReplacements = async (req, reply) => {
     const {
       page = 1,
       limit = 10,
-      sortBy = 'createdAt',
-      sortOrder = 'desc',
+      sortBy = "createdAt",
+      sortOrder = "desc",
     } = req.query;
 
     const filter = buildFilter(req.query);
@@ -41,11 +44,11 @@ export const getAllMeterReplacements = async (req, reply) => {
 
     const total = await MeterReplacement.countDocuments(filter);
     const meterReplacements = await MeterReplacement.find(filter)
-      .populate('consumer_id', 'name email') // optional: show user info
-      .populate('photo_id', 'name email') // optional
+      .populate("consumerNumber", "name email") // optional: show user info
+      .populate("photo_id", "name email") // optional
       .skip(skip)
       .limit(parseInt(limit))
-      .sort({ [sortBy]: sortOrder === 'asc' ? 1 : -1 });
+      .sort({ [sortBy]: sortOrder === "asc" ? 1 : -1 });
 
     return successResponse(
       reply,
@@ -58,10 +61,15 @@ export const getAllMeterReplacements = async (req, reply) => {
           totalPages: Math.ceil(total / limit),
         },
       },
-      'Meter replacements fetched successfully'
+      "Meter replacements fetched successfully"
     );
   } catch (error) {
-    return errorResponse(reply, 'Failed to fetch meter replacements', 500, error);
+    return errorResponse(
+      reply,
+      "Failed to fetch meter replacements",
+      500,
+      error
+    );
   }
 };
 
@@ -72,16 +80,53 @@ export const getMeterReplacementById = async (req, reply) => {
   try {
     const { id } = req.params;
     const record = await MeterReplacement.findById(id)
-      .populate('consumer_id', 'name email')
-      .populate('photo_id', 'name email');
+      .populate("consumerNumber", "name email")
+      .populate("photo_id", "name email");
 
     if (!record) {
-      return errorResponse(reply, 'Meter replacement not found', 404);
+      return errorResponse(reply, "Meter replacement not found", 404);
     }
 
-    return successResponse(reply, record, 'Meter replacement fetched successfully');
+    return successResponse(
+      reply,
+      record,
+      "Meter replacement fetched successfully"
+    );
   } catch (error) {
-    return errorResponse(reply, 'Failed to fetch meter replacement', 500, error);
+    return errorResponse(
+      reply,
+      "Failed to fetch meter replacement",
+      500,
+      error
+    );
+  }
+};
+
+export const getMeterReplacementByConsumerNumber =async (req, reply) => {
+  try {
+    const consumerNumber = req.user.consumerCode
+    console.log("req.user.consumerCode",consumerNumber)
+    const record = await MeterReplacement.find({consumerNumber})
+
+    console.log("record",record);
+    
+
+    if (!record) {
+      return errorResponse(reply, "Meter replacement not found", 404);
+    }
+
+    return successResponse(
+      reply,
+      record,
+      "Meter replacement fetched successfully"
+    );
+  } catch (error) {
+    return errorResponse(
+      reply,
+      "Failed to fetch meter replacement",
+      500,
+      error
+    );
   }
 };
 
@@ -90,10 +135,10 @@ export const getMeterReplacementById = async (req, reply) => {
  */
 export const createMeterReplacement = async (req, reply) => {
   try {
-    const { consumer_id, reason, photo_id, status } = req.body;
-
+    const { reason, photo_id, status } = req.body;
+    const consumerNumber = req.user?.consumerCode;
     const newRecord = new MeterReplacement({
-      consumer_id,
+      consumerNumber,
       reason,
       photo_id,
       status,
@@ -101,9 +146,18 @@ export const createMeterReplacement = async (req, reply) => {
 
     const savedRecord = await newRecord.save();
 
-    return successResponse(reply, savedRecord, 'Meter replacement created successfully');
+    return successResponse(
+      reply,
+      savedRecord,
+      "Meter replacement created successfully"
+    );
   } catch (error) {
-    return errorResponse(reply, 'Failed to create meter replacement', 500, error);
+    return errorResponse(
+      reply,
+      "Failed to create meter replacement",
+      500,
+      error
+    );
   }
 };
 
@@ -114,18 +168,31 @@ export const updateMeterReplacement = async (req, reply) => {
   try {
     const { id } = req.params;
 
-    const updatedRecord = await MeterReplacement.findByIdAndUpdate(id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const updatedRecord = await MeterReplacement.findByIdAndUpdate(
+      id,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
     if (!updatedRecord) {
-      return errorResponse(reply, 'Meter replacement not found', 404);
+      return errorResponse(reply, "Meter replacement not found", 404);
     }
 
-    return successResponse(reply, updatedRecord, 'Meter replacement updated successfully');
+    return successResponse(
+      reply,
+      updatedRecord,
+      "Meter replacement updated successfully"
+    );
   } catch (error) {
-    return errorResponse(reply, 'Failed to update meter replacement', 500, error);
+    return errorResponse(
+      reply,
+      "Failed to update meter replacement",
+      500,
+      error
+    );
   }
 };
 
@@ -139,12 +206,21 @@ export const deleteMeterReplacement = async (req, reply) => {
     const deletedRecord = await MeterReplacement.findByIdAndDelete(id);
 
     if (!deletedRecord) {
-      return errorResponse(reply, 'Meter replacement not found', 404);
+      return errorResponse(reply, "Meter replacement not found", 404);
     }
 
-    return successResponse(reply, null, 'Meter replacement deleted successfully');
+    return successResponse(
+      reply,
+      null,
+      "Meter replacement deleted successfully"
+    );
   } catch (error) {
-    return errorResponse(reply, 'Failed to delete meter replacement', 500, error);
+    return errorResponse(
+      reply,
+      "Failed to delete meter replacement",
+      500,
+      error
+    );
   }
 };
 
@@ -154,10 +230,12 @@ export const forwardRevertMeterReplacement = async (req, reply) => {
     const { assign_to, status, comment, formName } = req.body;
 
     // Get current meter replacement to know the current assignedTo
-    const currentMeterReplacement = await MeterReplacement.findById(meterReplacementId);
-    
+    const currentMeterReplacement = await MeterReplacement.findById(
+      meterReplacementId
+    );
+
     if (!currentMeterReplacement) {
-      return errorResponse(reply, 'Meter Replacement not found', 404);
+      return errorResponse(reply, "Meter Replacement not found", 404);
     }
 
     let newAssignedTo;
@@ -168,25 +246,32 @@ export const forwardRevertMeterReplacement = async (req, reply) => {
       // For Forward: assign to the new user provided in assign_to
       newAssignedTo = assign_to;
       newUserId = assign_to;
-      
     } else if (status === "Revert") {
       // For Revert: fetch the last track record to get previous user
       const lastTrackRecord = await FormTrack.findOne({
-        form_id: meterReplacementId
+        form_id: meterReplacementId,
       }).sort({ createdAt: -1 });
-      
+
       console.log("lastTrackRecord", lastTrackRecord);
-      
+
       if (!lastTrackRecord) {
-        return errorResponse(reply, 'No previous track record found to revert', 404);
+        return errorResponse(
+          reply,
+          "No previous track record found to revert",
+          404
+        );
       }
 
       // Revert to the old_user_id from the last record
       newAssignedTo = lastTrackRecord.old_user_id;
       newUserId = lastTrackRecord.old_user_id;
-      
+
       if (!newAssignedTo) {
-        return errorResponse(reply, 'Unable to determine previous user for revert', 400);
+        return errorResponse(
+          reply,
+          "Unable to determine previous user for revert",
+          400
+        );
       }
     }
 
@@ -197,16 +282,15 @@ export const forwardRevertMeterReplacement = async (req, reply) => {
       { new: true, runValidators: true }
     );
 
-    // Create the tracking record
     const newRecord = new FormTrack({
       form_id: meterReplacementId,
       formName,
-      old_user_id: oldUserId,              // ✅ Current owner (from MeterReplacement)
-      new_user_id: newUserId,              // ✅ New owner (where it's going)
-      assign_to: newAssignedTo,            // ✅ Same as new_user_id
+      old_user_id: oldUserId,
+      new_user_id: newUserId,
+      assign_to: newAssignedTo,
       comment: comment || "",
       status,
-      submitted_by: req.user._id           // ✅ Who performed the action
+      submitted_by: req.user._id,
     });
     await newRecord.save();
 
@@ -214,14 +298,19 @@ export const forwardRevertMeterReplacement = async (req, reply) => {
       reply,
       {
         meterReplacement: updatedMeterReplacement,
-        track: newRecord
+        track: newRecord,
       },
-      status === "Revert" 
-        ? 'Meter replacement reverted successfully' 
-        : 'Meter replacement forwarded successfully'
+      status === "Revert"
+        ? "Meter replacement reverted successfully"
+        : "Meter replacement forwarded successfully"
     );
   } catch (error) {
-    return errorResponse(reply, 'Failed to update meter replacement', 500, error);
+    return errorResponse(
+      reply,
+      "Failed to update meter replacement",
+      500,
+      error
+    );
   }
 };
 
@@ -232,7 +321,7 @@ export const forwardRevertMeterReplacement = async (req, reply) => {
 
 //     // Get current meter replacement to know the current assignedTo
 //     const currentMeterReplacement = await MeterReplacement.findById(meterReplacementId);
-    
+
 //     if (!currentMeterReplacement) {
 //       return errorResponse(reply, 'Meter Replacement not found', 404);
 //     }
@@ -245,7 +334,7 @@ export const forwardRevertMeterReplacement = async (req, reply) => {
 //       // For Forward: assign to the new user provided in assign_to
 //       newAssignedTo = assign_to;
 //       newUserId = assign_to;
-      
+
 //     } else if (status === "Revert") {
 //       // For Revert: fetch the last track record to get previous user
 //       const lastTrackRecord = await FormTrack.findOne({
@@ -259,7 +348,7 @@ export const forwardRevertMeterReplacement = async (req, reply) => {
 //       // Revert to the old_user_id from the last record
 //       newAssignedTo = lastTrackRecord.old_user_id;
 //       newUserId = lastTrackRecord.old_user_id;
-      
+
 //       if (!newAssignedTo) {
 //         return errorResponse(reply, 'Unable to determine previous user for revert', 400);
 //       }
@@ -291,8 +380,8 @@ export const forwardRevertMeterReplacement = async (req, reply) => {
 //         meterReplacement: updatedMeterReplacement,
 //         track: newRecord
 //       },
-//       status === "Revert" 
-//         ? 'Meter replacement reverted successfully' 
+//       status === "Revert"
+//         ? 'Meter replacement reverted successfully'
 //         : 'Meter replacement forwarded successfully'
 //     );
 //   } catch (error) {
