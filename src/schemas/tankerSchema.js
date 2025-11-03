@@ -178,7 +178,7 @@ const tankerSchema = {
           default: "createdAt",
         },
         sortOrder: { type: "string", enum: ["asc", "desc"], default: "desc" },
-        status: { type: "string", enum: ["Approved", "Rejected", "Pending", "Draft"] },
+        status: { type: "string", enum: ["All","Approved", "Rejected", "Pending", "Draft"] },
         consumerNumber: { type: "string" },
         mobileNumber: { type: "string", pattern: "^[0-9]{10}$" },
       },

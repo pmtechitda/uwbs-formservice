@@ -128,7 +128,7 @@ const meterReplacementSchema = {
         sortOrder: { type: "string", enum: ["asc", "desc"], default: "desc" },
         status: {
           type: "string",
-          enum: ["Approved", "Rejected", "Pending", "Draft"],
+          enum: ["All", "Approved", "Rejected", "Pending", "Draft"],
         },
       },
       additionalProperties: true,
