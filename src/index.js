@@ -46,7 +46,7 @@ async function start() {
     await connectRPC();
     errorHandler(fastify);
 
-    const port = Number(process.env.PORT) || 300;
+    const port = Number(process.env.PORT) || 3003;
     await fastify.listen({ port, host: "0.0.0.0" });
     fastify.log.info(`Form Service Running On :${port}`);
     
