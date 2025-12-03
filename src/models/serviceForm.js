@@ -5,11 +5,15 @@ const { Schema, Types } = mongoose;
 const serviceFormSchema = new Schema(
     {
 
+        applicationNo: { type: String, unique: true, required: true },
+
         serviceType: {
             type: String,
             enum: ["MeterReplacement", "Mutation", "Reconnection", "Tanker"],
             required: true,
         },
+
+
 
         consumer_id: { type: Types.ObjectId },
         consumerNumber: { type: String, trim: true },

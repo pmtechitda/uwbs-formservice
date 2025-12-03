@@ -128,6 +128,25 @@ export const createServiceForm = async (request, reply) => {
       payload.submittedBy = request.user.id;
     }
 
+    // Generate unique applicationNo UWBS(M)YYMM(7 digit unique number timestam) M depand on this  enum: ["MeterReplacement", "Mutation", "Reconnection", "Tanker"],
+    const now = new Date();
+    const year = String(now.getFullYear()).slice(-2);
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const prefix = `UWBS${payload.serviceType.charAt(0)}-${year}${month}`;
+    const lastForm = await ServiceForm
+        .findOne({ applicationNo: { $regex: `^${prefix}` } })
+        .sort({ applicationNo: -1 })
+        .lean();
+    let uniqueNumber = 1;
+    if (lastForm) {
+        const lastNumber = parseInt(lastForm.applicationNo.slice(-7), 10);
+        if (!isNaN(lastNumber)) {
+            uniqueNumber = lastNumber + 1;
+        }
+    }
+    payload.applicationNo = `${prefix}${String(uniqueNumber).padStart(7, '0')}`;
+    
+
     const doc = new ServiceForm(payload);
     const saved = await doc.save();
 
