@@ -1,0 +1,64 @@
+import mongoose from "mongoose";
+
+const { Schema, Types } = mongoose;
+
+const serviceFormSchema = new Schema(
+    {
+
+        serviceType: {
+            type: String,
+            enum: ["MeterReplacement", "Mutation", "Reconnection", "Tanker"],
+            required: true,
+        },
+
+        consumer_id: { type: Types.ObjectId },
+        consumerNumber: { type: String, trim: true },
+
+        current_name: { type: String, trim: true },
+        current_fatherName: { type: String, trim: true },
+
+        current_mobileNumber: {
+            type: String,
+            match: [/^[0-9]{10}$/, "Invalid mobile number"],
+        },
+
+        new_name: { type: String, trim: true },
+        new_fatherName: { type: String, trim: true },
+        new_mobileNumber: {
+            type: String,
+            match: [/^[0-9]{10}$/, "Invalid mobile number"],
+        },
+
+        reason: { type: String, trim: true },
+        documents: {
+            idProof: { type: String },
+            selfPhoto: { type: String },
+            registryDocument: { type: String },
+            stampPaper: { type: String },
+        },
+
+        is_paid: { type: Boolean, default: false },        
+        previousAmount: { type: String },
+        charges: { type: String },
+        otherCharges: { type: String },
+        totalAmount: { type: String },
+
+        // Assignment
+        assignedTo: { type: String },
+        submittedBy: { type: String },
+        submittedType: { type: String, enum: ["Consumer", "RO", "CSC", "Apuni Sarkar"] },
+
+        // Status for all services
+        status: {
+            type: String,
+            enum: ["Approved", "Rejected", "Pending", "Draft"],
+            default: "Draft",
+        },
+    },
+    {
+        timestamps: true,
+        versionKey: false,
+    }
+);
+
+export default mongoose.model("ServiceForm", serviceFormSchema);
