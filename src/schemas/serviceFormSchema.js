@@ -188,6 +188,35 @@ const serviceFormSchemas = {
     },
   },
 
+  // Get tracking info
+  getServiceFormTrackSchema: {
+    tags: ["ServiceForm"],
+    params: {
+      type: "object",
+      required: ["id"],
+      properties: {
+        id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
+      },
+      errorMessage: {
+        required: { id: "ID is required" },
+        properties: { id: "Invalid ID format (must be MongoDB ObjectId)" },
+      },
+    },
+    response: {
+      200: {
+        type: "object",
+        properties: {
+          success: { type: "boolean" },
+          message: { type: "string" },
+          data: {
+            type: "object",
+            additionalProperties: true,
+          },
+        },
+      },
+    },
+  },
+
   // Get by consumerNumber (query param)
   getServiceFormByConsumerNumberSchema: {
     tags: ["ServiceForm"],

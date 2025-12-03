@@ -18,6 +18,12 @@ export default async function serviceFormRoutes(fastify, opts) {
   );
 
   fastify.get(
+    '/serviceforms/:id/track',
+    authRoute(serviceFormSchema.getServiceFormTrackSchema, 'ServiceForm'),
+    controller.getServiceFormTrack
+  );
+
+  fastify.get(
     '/serviceforms/consumerNo',
     authRoute(serviceFormSchema.getServiceFormByConsumerNumberSchema, 'ServiceForm'),
     controller.getServiceFormByConsumerNumber

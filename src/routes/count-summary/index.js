@@ -4,27 +4,17 @@ import * as controller from '../../controllers/count-summary-controller/index.js
 export default async function meterReplacementRoutes(fastify, opts) {
   const { authRoute } = opts;
 
-  // Schema for individual status counts (simple object with status: count)
   const statusCountsSchema = {
     type: "object",
     properties: {
       Pending: { type: "number" },
       Approved: { type: "number" },
       Rejected: { type: "number" },
-      Draft: { type: "number" }
+      Draft: { type: "number" },
+      Processing: { type: "number" },
     },
-    additionalProperties: false
-  };
-
-  // Schema for each form type (e.g., meterReplacement, mutation, etc.)
-  const formTypeSchema = {
-    type: "object",
-    properties: {
-      statusCounts: statusCountsSchema,
-      total: { type: "number" }
-    },
-    required: ["statusCounts", "total"],
-    additionalProperties: false
+    additionalProperties: false,
+    required: ["Pending", "Approved", "Rejected", "Draft", "Processing"],
   };
 
   const getFormServicesCountSchema = {
@@ -39,20 +29,17 @@ export default async function meterReplacementRoutes(fastify, opts) {
           data: {
             type: "object",
             properties: {
-              meterReplacement: formTypeSchema,
-              mutation: formTypeSchema,
-              reconnection: formTypeSchema,
-              tanker: formTypeSchema,
-              grandTotal: { type: "number" }
+              statusCounts: statusCountsSchema,
+              total: { type: "number" },
             },
-            required: ["meterReplacement", "mutation", "reconnection", "tanker", "grandTotal"],
-            additionalProperties: false
-          }
+            required: ["statusCounts", "total"],
+            additionalProperties: false,
+          },
         },
         required: ["success", "message", "data"],
-        additionalProperties: false
-      }
-    }
+        additionalProperties: false,
+      },
+    },
   };
   
   fastify.get(

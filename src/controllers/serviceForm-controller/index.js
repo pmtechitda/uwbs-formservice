@@ -266,6 +266,23 @@ export const patchServiceForm = async (request, reply) => {
   }
 };
 
+// GET /serviceforms/:id/track
+export const getServiceFormTrack = async (request, reply) => {
+  try {
+    const { id } = request.params;
+    request.log?.info?.({ id }, 'Fetching service form track');
+    if (!isValidObjectId(id)) return reply.code(400).send({ success: false, message: 'Invalid id' });
+
+    const track = await FormTrack.findOne({ form_id: id }).lean();
+    if (!track) return reply.code(404).send({ success: false, message: 'No tracking info found' });
+
+    return reply.code(200).send({ success: true, message: 'Tracking fetched', data: track });
+  } catch (err) {
+    request.log?.error?.(err);
+    return reply.code(500).send({ success: false, message: 'Server error' });
+  }
+};
+
 // DELETE /serviceforms/:id
 export const deleteServiceForm = async (request, reply) => {
   try {
@@ -314,6 +331,7 @@ export default {
   createServiceForm,
   updateServiceForm,
   patchServiceForm,
+  getServiceFormTrack,
   deleteServiceForm,
   bulkDeleteServiceForms,
 };
