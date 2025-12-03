@@ -18,13 +18,15 @@ const recordTrack = async (formDoc, action = 'Update', userId, comment) => {
     updatedAt: new Date(),
   };
 
+  const applicationNo = formDoc.applicationNo || String(formDoc._id);
+
   await FormTrack.findOneAndUpdate(
     { form_id: formDoc._id },
     {
       $setOnInsert: {
         form_id: formDoc._id,
         formName: 'ServiceForm',
-        applicationNo: formDoc.applicationNo,
+        applicationNo,
       },
       $set: {
         status: formDoc.status,
@@ -33,6 +35,7 @@ const recordTrack = async (formDoc, action = 'Update', userId, comment) => {
         action,
         comment,
         actedBy: userId,
+        applicationNo,
       },
       $push: { statusHistory: historyEntry },
     },
