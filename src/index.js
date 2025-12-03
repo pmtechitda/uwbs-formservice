@@ -2,6 +2,7 @@ import Fastify from "fastify";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { connectRPC } from "./utils/rpcClient.js";
+import startServiceStatusConsumer from "./rpc/serviceStatusUpdate.js";
 import masterRoutes from "./routes/master.routes.js";
 import authPlugin from "./plugins/auth.js";
 import errorHandler from "./utils/errorHandler.js";
@@ -44,7 +45,7 @@ async function start() {
     await fastify.register(masterRoutes, { prefix: "/api" });
     await mongoose.connect(process.env.MONGO_URI);
     await connectRPC();
-    await updateServiceStatusRPC();
+    await startServiceStatusConsumer();
     errorHandler(fastify);
 
     const port = Number(process.env.PORT) || 3003;
