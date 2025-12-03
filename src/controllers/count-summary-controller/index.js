@@ -2,12 +2,20 @@ import ServiceForm from '../../models/serviceForm.js';
 import { successResponse, errorResponse } from '../../utils/response.util.js';
 
 const statusEnum = ["Approved", "Rejected", "Pending", "Draft", "Processing"];
+const serviceTypeEnum = ["MeterReplacement", "Mutation", "Reconnection", "Tanker"];
 
 // GET /form-services/count
 export const getFormCountByStatus = async (req, reply) => {
   try {
+    const { type } = req.query || {};
+
+    const match = { status: { $in: statusEnum } };
+    if (type && type !== 'All' && serviceTypeEnum.includes(type)) {
+      match.serviceType = type;
+    }
+
     const rows = await ServiceForm.aggregate([
-      { $match: { status: { $in: statusEnum } } },
+      { $match: match },
       {
         $group: {
           _id: "$status",
@@ -34,4 +42,3 @@ export const getFormCountByStatus = async (req, reply) => {
     return errorResponse(reply, "Failed to fetch form status counts", 500, error);
   }
 };
-

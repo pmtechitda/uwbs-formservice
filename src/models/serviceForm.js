@@ -17,8 +17,9 @@ const serviceFormSchema = new Schema(
         departmentName: { type: String, required: true },
         division_id: { type: Types.ObjectId, required: true },
         division_name: { type: String, required: true },
-        collection_center_id: { type: Types.ObjectId, required: true },
-        collection_center_name: { type: String, required: true },
+        collection_center_id: { type: Types.ObjectId},
+        collection_center_name: { type: String },
+        area_type: { type: String, enum: ["Urban", "Rural"] },
 
 
         consumer_id: { type: Types.ObjectId },

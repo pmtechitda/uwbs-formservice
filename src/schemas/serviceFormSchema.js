@@ -10,6 +10,11 @@ const serviceFormSchemas = {
         "consumerNumber",
         "current_name",
         "current_mobileNumber",
+        "department_id",
+        "departmentName",
+        "division_id",
+        "division_name",
+        "area_type",
       ],
       properties: {
         serviceType: {
@@ -22,6 +27,7 @@ const serviceFormSchemas = {
         division_name: { type: "string", minLength: 1 },
         collection_center_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
         collection_center_name: { type: "string", minLength: 1 },
+        area_type: { type: "string", enum: ["Urban", "Rural"] },
         consumer_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
         consumerNumber: { type: "string", minLength: 1 },
 
@@ -92,6 +98,7 @@ const serviceFormSchemas = {
           division_name: "Division name is required",
           collection_center_id: "Collection center is required",
           collection_center_name: "Collection center name is required",
+          area_type: "Area type is required",
         },
         properties: {
           current_mobileNumber: "Current mobile number must be 10 digits",
@@ -283,6 +290,7 @@ const serviceFormSchemas = {
         department_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
         division_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
         collection_center_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
+        area_type: { type: "string", enum: ["Urban", "Rural"] },
       },
       additionalProperties: true,
       errorMessage: {
@@ -361,6 +369,7 @@ const serviceFormSchemas = {
         division_name: { type: "string" },
         collection_center_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
         collection_center_name: { type: "string" },
+        area_type: { type: "string", enum: ["Urban", "Rural"] },
         consumer_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
         consumerNumber: { type: "string" },
 
@@ -449,6 +458,7 @@ const serviceFormSchemas = {
         division_name: { type: "string" },
         collection_center_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
         collection_center_name: { type: "string" },
+        area_type: { type: "string", enum: ["Urban", "Rural"] },
         current_name: { type: "string" },
         current_fatherName: { type: "string" },
         current_mobileNumber: { type: "string", pattern: "^[0-9]{10}$" },

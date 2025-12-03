@@ -20,6 +20,17 @@ export default async function meterReplacementRoutes(fastify, opts) {
   const getFormServicesCountSchema = {
     tags: ["application"],
     security: [{ bearerAuth: [] }],
+    querystring: {
+      type: "object",
+      properties: {
+        type: {
+          type: "string",
+          enum: ["All", "MeterReplacement", "Mutation", "Reconnection", "Tanker"],
+          default: "All",
+        },
+      },
+      additionalProperties: false,
+    },
     response: {
       200: {
         type: "object",

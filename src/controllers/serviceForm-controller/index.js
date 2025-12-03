@@ -59,6 +59,7 @@ export const getAllServiceForms = async (request, reply) => {
       department_id,
       division_id,
       collection_center_id,
+      area_type,
       is_paid,
       sortBy = 'createdAt',
       sortOrder = 'desc',
@@ -90,6 +91,7 @@ export const getAllServiceForms = async (request, reply) => {
     if (department_id && isValidObjectId(department_id)) filter.department_id = new Types.ObjectId(department_id);
     if (division_id && isValidObjectId(division_id)) filter.division_id = new Types.ObjectId(division_id);
     if (collection_center_id && isValidObjectId(collection_center_id)) filter.collection_center_id = new Types.ObjectId(collection_center_id);
+    if (area_type) filter.area_type = area_type;
     if (typeof is_paid !== 'undefined' && is_paid !== 'All') {
       if (is_paid === 'true' || is_paid === '1') filter.is_paid = true;
       else if (is_paid === 'false' || is_paid === '0') filter.is_paid = false;
