@@ -1,9 +1,4 @@
-import meterReplacement from './meter-replacement-routes/index.js'
-import reconnection from './reconnection-routes/index.js'
-import tanker from './tanker-routes/index.js'
-import mutation from './mutation-routes/index.js'
 import serviceForm from './serviceformroutes/index.js'
-
 import serviceFormCount from './count-summary/index.js'
 
 async function masterRoutes(fastify, opts) {
