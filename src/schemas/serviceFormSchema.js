@@ -187,6 +187,12 @@ const serviceFormSchemas = {
               status: { type: "string" },
               createdAt: { type: "string", format: "date-time" },
               updatedAt: { type: "string", format: "date-time" },
+              track: {
+                anyOf: [
+                  { type: "object", additionalProperties: true },
+                  { type: "null" },
+                ],
+              },
             },
             additionalProperties: true,
           },
@@ -257,6 +263,12 @@ const serviceFormSchemas = {
                 status: { type: "string" },
                 createdAt: { type: "string", format: "date-time" },
                 updatedAt: { type: "string", format: "date-time" },
+                track: {
+                  anyOf: [
+                    { type: "object", additionalProperties: true },
+                    { type: "null" },
+                  ],
+                },
               },
             },
           },

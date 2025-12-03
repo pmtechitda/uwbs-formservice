@@ -136,10 +136,17 @@ export const getServiceFormById = async (request, reply) => {
       return reply.code(400).send({ success: false, message: 'Invalid id' });
     }
 
-    const doc = await ServiceForm.findById(id).lean();
+    const [doc, track] = await Promise.all([
+      ServiceForm.findById(id).lean(),
+      FormTrack.findOne({ form_id: id }).lean(),
+    ]);
     if (!doc) return reply.code(404).send({ success: false, message: 'Not found' });
 
-    return reply.code(200).send({ success: true, message: 'Service form fetched', data: doc });
+    return reply.code(200).send({
+      success: true,
+      message: 'Service form fetched',
+      data: { ...doc, track },
+    });
   } catch (err) {
     request.log?.error?.(err);
     return reply.code(500).send({ success: false, message: 'Server error' });
@@ -156,7 +163,17 @@ export const getServiceFormByConsumerNumber = async (request, reply) => {
     }
 
     const docs = await ServiceForm.find({ consumerNumber }).sort({ createdAt: -1 }).lean();
-    return reply.code(200).send({ success: true, message: 'Service forms fetched', data: docs });
+    const formIds = docs.map((doc) => doc?._id).filter(Boolean);
+    const tracks = formIds.length
+      ? await FormTrack.find({ form_id: { $in: formIds } }).lean()
+      : [];
+    const trackMap = new Map(tracks.map((t) => [String(t.form_id), t]));
+    const dataWithTrack = docs.map((doc) => ({
+      ...doc,
+      track: trackMap.get(String(doc._id)) || null,
+    }));
+
+    return reply.code(200).send({ success: true, message: 'Service forms fetched', data: dataWithTrack });
   } catch (err) {
     request.log?.error?.(err);
     return reply.code(500).send({ success: false, message: 'Server error' });
