@@ -4,6 +4,8 @@ import tanker from './tanker-routes/index.js'
 import mutation from './mutation-routes/index.js'
 import serviceForm from './serviceformroutes/index.js'
 
+import serviceFormCount from './count-summary/index.js'
+
 async function masterRoutes(fastify, opts) {
   const authRoute = (schema = {}, tag = 'Misc') => ({
     preHandler: [fastify.authenticate],
@@ -21,6 +23,7 @@ async function masterRoutes(fastify, opts) {
   await fastify.register(serviceForm, { authRoute });
 
 
+  await fastify.register(serviceFormCount, { authRoute });
 }
 
 export default masterRoutes;
