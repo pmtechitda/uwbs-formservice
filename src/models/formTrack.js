@@ -2,35 +2,56 @@
 import mongoose from "mongoose";
 const { Schema, Types } = mongoose;
 
-const FormTrack = new Schema(
+const statusEnum = ["Approved", "Rejected", "Pending", "Draft", "Processing"];
+const subStatusEnum = [
+  "Draft",
+  "Application Received",
+  "Under Verification",
+  "RO Forward to JE",
+  "JE Revert to RO",
+  "Under Inspection",
+  "Approved",
+  "Rejected",
+  "Pending Payment",
+];
+
+const historySchema = new Schema(
   {
-    applicationNo: { type: String, unique: true, required: true },
-    statusHistory: [
-      {
-        status: {
-          type: String,
-          enum: ["Approved", "Rejected", "Pending", "Draft", "Processing"],
-        },
-        sub_status: { 
-            type: String,
-            enum: [
-                "Application Received",
-                "Under Verification",
-                "RO Forward to JE",
-                "JE Revert to RO",
-                "Under Inspection",
-                "Approved",
-                "Rejected",
-                "Pending Payment"
-            ], 
-            default: "Application Received" 
-        },
-        updatedAt: { type: Date, default: Date.now },
-        updatedBy: { type: String },
-      },
-    ],
+    status: { type: String, enum: statusEnum },
+    sub_status: { type: String, enum: subStatusEnum },
+    assignedTo: { type: String },
+    action: {
+      type: String,
+      enum: ["Created", "StatusChange", "Forward", "Revert", "Comment", "Update"],
+      default: "StatusChange",
+    },
+    comment: { type: String },
+    updatedAt: { type: Date, default: Date.now },
+    updatedBy: { type: String },
+  },
+  { _id: false }
+);
+
+const formTrackSchema = new Schema(
+  {
+    form_id: { type: Types.ObjectId, required: true, index: true , ref: "ServiceForm" },
+    status: { type: String, enum: statusEnum },
+    sub_status: { type: String, enum: subStatusEnum },
+    assignedTo: { type: String },
+
+    // Action metadata
+    action: {
+      type: String,
+      enum: ["Created", "StatusChange", "Forward", "Revert", "Comment", "Update"],
+      default: "StatusChange",
+    },
+    comment: { type: String },
+    actedBy: { type: String },
+
+    // History log
+    statusHistory: [historySchema],
   },
   { timestamps: true }
 );
 
-export default mongoose.model("FormTrack", FormTrack);
+export default mongoose.model("FormTrack", formTrackSchema);

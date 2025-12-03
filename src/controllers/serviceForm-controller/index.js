@@ -1,15 +1,51 @@
 // controllers/serviceForm-controller/index.js
 import mongoose from 'mongoose';
-import ServiceForm from '../../models/serviceForm.js'; 
+import ServiceForm from '../../models/serviceForm.js';
+import FormTrack from '../../models/formTrack.js';
 
 const { Types } = mongoose;
 const isValidObjectId = (id) => Types.ObjectId.isValid(id);
+
+// Append a status history entry and keep latest snapshot for tracking UI
+const recordTrack = async (formDoc, action = 'Update', userId, comment) => {
+  const historyEntry = {
+    status: formDoc.status,
+    sub_status: formDoc.sub_status,
+    assignedTo: formDoc.assignedTo,
+    action,
+    comment,
+    updatedBy: userId,
+    updatedAt: new Date(),
+  };
+
+  await FormTrack.findOneAndUpdate(
+    { form_id: formDoc._id },
+    {
+      $setOnInsert: {
+        form_id: formDoc._id,
+        formName: 'ServiceForm',
+        applicationNo: formDoc.applicationNo,
+      },
+      $set: {
+        status: formDoc.status,
+        sub_status: formDoc.sub_status,
+        assignedTo: formDoc.assignedTo,
+        action,
+        comment,
+        actedBy: userId,
+      },
+      $push: { statusHistory: historyEntry },
+    },
+    { new: true, upsert: true }
+  );
+};
 
 
 
 // GET /serviceforms
 export const getAllServiceForms = async (request, reply) => {
   try {
+    request.log?.info?.('Fetching service forms list');
     const {
       page = 1,
       limit = 10,
@@ -89,6 +125,7 @@ export const getAllServiceForms = async (request, reply) => {
 export const getServiceFormById = async (request, reply) => {
   try {
     const { id } = request.params;
+    request.log?.info?.({ id }, 'Fetching service form by id');
     if (!isValidObjectId(id)) {
       return reply.code(400).send({ success: false, message: 'Invalid id' });
     }
@@ -107,6 +144,7 @@ export const getServiceFormById = async (request, reply) => {
 export const getServiceFormByConsumerNumber = async (request, reply) => {
   try {
     const { consumerNumber } = request.query;
+    request.log?.info?.({ consumerNumber }, 'Fetching service forms by consumerNumber');
     if (!consumerNumber) {
       return reply.code(400).send({ success: false, message: 'consumerNumber is required' });
     }
@@ -122,6 +160,7 @@ export const getServiceFormByConsumerNumber = async (request, reply) => {
 // POST /serviceforms
 export const createServiceForm = async (request, reply) => {
   try {
+    request.log?.info?.('Creating new service form');
     const payload = { ...request.body };
 
     if (payload.current_mobileNumber) payload.current_mobileNumber = String(payload.current_mobileNumber).replace(/\D/g, '');
@@ -159,6 +198,8 @@ export const createServiceForm = async (request, reply) => {
     const doc = new ServiceForm(payload);
     const saved = await doc.save();
 
+    await recordTrack(saved, 'Created', request.user?.id);
+
     return reply.code(201).send({ success: true, message: 'Created', data: saved });
   } catch (err) {
     request.log?.error?.(err);
@@ -173,6 +214,7 @@ export const createServiceForm = async (request, reply) => {
 export const updateServiceForm = async (request, reply) => {
   try {
     const { id } = request.params;
+    request.log?.info?.({ id }, 'Updating service form');
     if (!isValidObjectId(id)) return reply.code(400).send({ success: false, message: 'Invalid id' });
 
     const payload = { ...request.body };
@@ -186,6 +228,8 @@ export const updateServiceForm = async (request, reply) => {
     const updated = await ServiceForm.findByIdAndUpdate(id, payload, { new: true, runValidators: true });
     if (!updated) return reply.code(404).send({ success: false, message: 'Not found' });
 
+    await recordTrack(updated, 'Update', request.user?.id);
+
     return reply.code(200).send({ success: true, message: 'Updated', data: updated });
   } catch (err) {
     request.log?.error?.(err);
@@ -198,6 +242,7 @@ export const updateServiceForm = async (request, reply) => {
 export const patchServiceForm = async (request, reply) => {
   try {
     const { id } = request.params;
+    request.log?.info?.({ id }, 'Patching service form');
     if (!isValidObjectId(id)) return reply.code(400).send({ success: false, message: 'Invalid id' });
 
     const payload = { ...request.body };
@@ -211,6 +256,8 @@ export const patchServiceForm = async (request, reply) => {
     const updated = await ServiceForm.findByIdAndUpdate(id, { $set: payload }, { new: true, runValidators: true });
     if (!updated) return reply.code(404).send({ success: false, message: 'Not found' });
 
+    await recordTrack(updated, 'Update', request.user?.id);
+
     return reply.code(200).send({ success: true, message: 'Patched', data: updated });
   } catch (err) {
     request.log?.error?.(err);
@@ -223,6 +270,7 @@ export const patchServiceForm = async (request, reply) => {
 export const deleteServiceForm = async (request, reply) => {
   try {
     const { id } = request.params;
+    request.log?.info?.({ id }, 'Deleting service form');
     if (!isValidObjectId(id)) return reply.code(400).send({ success: false, message: 'Invalid id' });
 
     const deleted = await ServiceForm.findByIdAndDelete(id);
@@ -239,6 +287,7 @@ export const deleteServiceForm = async (request, reply) => {
 export const bulkDeleteServiceForms = async (request, reply) => {
   try {
     const { ids } = request.body || {};
+    request.log?.info?.({ idsCount: Array.isArray(ids) ? ids.length : 0 }, 'Bulk deleting service forms');
     if (!Array.isArray(ids) || ids.length === 0) {
       return reply.code(400).send({ success: false, message: 'ids array required' });
     }
