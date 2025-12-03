@@ -118,12 +118,15 @@ export const createServiceForm = async (request, reply) => {
   try {
     const payload = { ...request.body };
 
-    // Normalize phone numbers: keep digits only
     if (payload.current_mobileNumber) payload.current_mobileNumber = String(payload.current_mobileNumber).replace(/\D/g, '');
     if (payload.new_mobileNumber) payload.new_mobileNumber = String(payload.new_mobileNumber).replace(/\D/g, '');
 
-    // If consumer_id exists and is string, convert to ObjectId (optional)
     if (payload.consumer_id && isValidObjectId(payload.consumer_id)) payload.consumer_id = Types.ObjectId(payload.consumer_id);
+
+    //update submittedBy and submittedType from auth info if available
+    if (request.user) {
+      payload.submittedBy = request.user.id;
+    }
 
     const doc = new ServiceForm(payload);
     const saved = await doc.save();
