@@ -11,10 +11,6 @@ async function masterRoutes(fastify, opts) {
     },
   });
 
-  await fastify.register(meterReplacement, { authRoute });
-  await fastify.register(reconnection, { authRoute });
-  await fastify.register(tanker, { authRoute });
-  await fastify.register(mutation, { authRoute });
   await fastify.register(serviceForm, { authRoute });
 
 
