@@ -72,7 +72,7 @@ const serviceFormSchemas = {
         },
         sub_status: {
           type: "string",
-          enum: [
+            enum: [
             "Draft",
             "Application Received",
             "Under Verification",
@@ -82,6 +82,8 @@ const serviceFormSchemas = {
             "Approved",
             "Rejected",
             "Pending Payment",
+            "AE Forward to EE",
+            "EE Forward to SE",
           ],
         },
       },
@@ -429,6 +431,8 @@ const serviceFormSchemas = {
             "Approved",
             "Rejected",
             "Pending Payment",
+            "AE Forward to EE",
+            "EE Forward to SE",
           ],
         },
       },
@@ -508,6 +512,8 @@ const serviceFormSchemas = {
             "Approved",
             "Rejected",
             "Pending Payment",
+            "AE Forward to EE",
+            "EE Forward to SE",
           ],
         },
       },

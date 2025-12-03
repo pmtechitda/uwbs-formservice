@@ -13,6 +13,8 @@ const subStatusEnum = [
   "Approved",
   "Rejected",
   "Pending Payment",
+  "AE Forward to EE",
+  "EE Forward to SE",
 ];
 
 const historySchema = new Schema(

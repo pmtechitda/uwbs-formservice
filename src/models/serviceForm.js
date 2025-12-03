@@ -77,7 +77,9 @@ const serviceFormSchema = new Schema(
                 "Under Inspection",
                 "Approved",
                 "Rejected",
-                "Pending Payment"
+                "Pending Payment",
+                "AE Forward to EE",
+                "EE Forward to SE"
             ], 
             default: "Draft" 
         },
