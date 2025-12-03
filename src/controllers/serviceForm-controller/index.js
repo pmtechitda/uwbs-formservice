@@ -35,7 +35,6 @@ const recordTrack = async (formDoc, action = 'Update', userId, comment) => {
         action,
         comment,
         actedBy: userId,
-        applicationNo,
       },
       $push: { statusHistory: historyEntry },
     },
