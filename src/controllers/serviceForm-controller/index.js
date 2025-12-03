@@ -21,7 +21,7 @@ const recordTrack = async (formDoc, action = 'Update', userId, comment) => {
   const applicationNo = formDoc.applicationNo || String(formDoc._id);
 
   await FormTrack.findOneAndUpdate(
-    { form_id: formDoc._id },
+    { form_id: formDoc._id, applicationNo },
     {
       $setOnInsert: {
         form_id: formDoc._id,

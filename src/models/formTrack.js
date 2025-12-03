@@ -35,6 +35,7 @@ const historySchema = new Schema(
 const formTrackSchema = new Schema(
   {
     form_id: { type: Types.ObjectId, required: true, index: true , ref: "ServiceForm" },
+    applicationNo: { type: String, required: true, unique: true },
     status: { type: String, enum: statusEnum },
     sub_status: { type: String, enum: subStatusEnum },
     assignedTo: { type: String },
