@@ -9,7 +9,7 @@ const serviceFormSchema = new Schema(
 
         serviceType: {
             type: String,
-            enum: ["MeterReplacement", "Mutation", "Reconnection", "Tanker"],
+            enum: ["MeterReplacement", "Mutation", "Reconnection", "Tanker", "Disconnection"],
             required: true,
         },
 

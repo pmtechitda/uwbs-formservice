@@ -46,3 +46,23 @@ export async function verifyTokenRPC(token) {
   })
 }
 
+export async function updateServiceStatusRPC(serviceFormId, status, sub_status) {
+  return new Promise((resolve, reject) => {
+    const correlationId = randomUUID()
+    correlationMap.set(correlationId, resolve)
+    channel.sendToQueue(
+      'update.service.status.request',
+      Buffer.from(JSON.stringify({ serviceFormId, status, sub_status })), 
+      {
+        replyTo: replyQueue,
+        correlationId,
+      }
+    )
+    setTimeout(() => {
+      if (correlationMap.has(correlationId)) {
+        correlationMap.delete(correlationId)
+        reject(new Error('Update service status timeout'))
+      }
+    }, 5000)
+  })
+}

@@ -44,6 +44,7 @@ async function start() {
     await fastify.register(masterRoutes, { prefix: "/api" });
     await mongoose.connect(process.env.MONGO_URI);
     await connectRPC();
+    await updateServiceStatusRPC();
     errorHandler(fastify);
 
     const port = Number(process.env.PORT) || 3003;
