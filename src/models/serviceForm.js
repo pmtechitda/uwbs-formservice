@@ -13,6 +13,12 @@ const serviceFormSchema = new Schema(
             required: true,
         },
 
+        department_id: { type: Types.ObjectId, required: true },
+        departmentName: { type: String, required: true },
+        division_id: { type: Types.ObjectId, required: true },
+        division_name: { type: String, required: true },
+        collection_center_id: { type: Types.ObjectId, required: true },
+        collection_center_name: { type: String, required: true },
 
 
         consumer_id: { type: Types.ObjectId },
@@ -62,6 +68,7 @@ const serviceFormSchema = new Schema(
         sub_status: { 
             type: String,
             enum: [
+                "Draft",
                 "Application Received",
                 "Under Verification",
                 "RO Forward to JE",
@@ -71,8 +78,12 @@ const serviceFormSchema = new Schema(
                 "Rejected",
                 "Pending Payment"
             ], 
-            default: "Application Received" 
+            default: "Draft" 
         },
+
+
+
+
 
     },
     {

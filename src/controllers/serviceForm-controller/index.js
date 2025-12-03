@@ -20,6 +20,9 @@ export const getAllServiceForms = async (request, reply) => {
       mobileNumber,
       assignedTo,
       submittedBy,
+      department_id,
+      division_id,
+      collection_center_id,
       is_paid,
       sortBy = 'createdAt',
       sortOrder = 'desc',
@@ -48,6 +51,9 @@ export const getAllServiceForms = async (request, reply) => {
     ]);
     if (assignedTo) filter.assignedTo = assignedTo;
     if (submittedBy) filter.submittedBy = submittedBy;
+    if (department_id && isValidObjectId(department_id)) filter.department_id = new Types.ObjectId(department_id);
+    if (division_id && isValidObjectId(division_id)) filter.division_id = new Types.ObjectId(division_id);
+    if (collection_center_id && isValidObjectId(collection_center_id)) filter.collection_center_id = new Types.ObjectId(collection_center_id);
     if (typeof is_paid !== 'undefined' && is_paid !== 'All') {
       if (is_paid === 'true' || is_paid === '1') filter.is_paid = true;
       else if (is_paid === 'false' || is_paid === '0') filter.is_paid = false;
@@ -121,6 +127,9 @@ export const createServiceForm = async (request, reply) => {
     if (payload.current_mobileNumber) payload.current_mobileNumber = String(payload.current_mobileNumber).replace(/\D/g, '');
     if (payload.new_mobileNumber) payload.new_mobileNumber = String(payload.new_mobileNumber).replace(/\D/g, '');
 
+    if (payload.department_id && isValidObjectId(payload.department_id)) payload.department_id = new Types.ObjectId(payload.department_id);
+    if (payload.division_id && isValidObjectId(payload.division_id)) payload.division_id = new Types.ObjectId(payload.division_id);
+    if (payload.collection_center_id && isValidObjectId(payload.collection_center_id)) payload.collection_center_id = new Types.ObjectId(payload.collection_center_id);
     if (payload.consumer_id && isValidObjectId(payload.consumer_id)) payload.consumer_id = new Types.ObjectId(payload.consumer_id);
 
     //update submittedBy and submittedType from auth info if available
@@ -169,6 +178,9 @@ export const updateServiceForm = async (request, reply) => {
     const payload = { ...request.body };
     if (payload.current_mobileNumber) payload.current_mobileNumber = String(payload.current_mobileNumber).replace(/\D/g, '');
     if (payload.new_mobileNumber) payload.new_mobileNumber = String(payload.new_mobileNumber).replace(/\D/g, '');
+    if (payload.department_id && isValidObjectId(payload.department_id)) payload.department_id = new Types.ObjectId(payload.department_id);
+    if (payload.division_id && isValidObjectId(payload.division_id)) payload.division_id = new Types.ObjectId(payload.division_id);
+    if (payload.collection_center_id && isValidObjectId(payload.collection_center_id)) payload.collection_center_id = new Types.ObjectId(payload.collection_center_id);
     if (payload.consumer_id && isValidObjectId(payload.consumer_id)) payload.consumer_id = new Types.ObjectId(payload.consumer_id);
 
     const updated = await ServiceForm.findByIdAndUpdate(id, payload, { new: true, runValidators: true });
@@ -191,6 +203,9 @@ export const patchServiceForm = async (request, reply) => {
     const payload = { ...request.body };
     if (payload.current_mobileNumber) payload.current_mobileNumber = String(payload.current_mobileNumber).replace(/\D/g, '');
     if (payload.new_mobileNumber) payload.new_mobileNumber = String(payload.new_mobileNumber).replace(/\D/g, '');
+    if (payload.department_id && isValidObjectId(payload.department_id)) payload.department_id = new Types.ObjectId(payload.department_id);
+    if (payload.division_id && isValidObjectId(payload.division_id)) payload.division_id = new Types.ObjectId(payload.division_id);
+    if (payload.collection_center_id && isValidObjectId(payload.collection_center_id)) payload.collection_center_id = new Types.ObjectId(payload.collection_center_id);
     if (payload.consumer_id && isValidObjectId(payload.consumer_id)) payload.consumer_id = new Types.ObjectId(payload.consumer_id);
 
     const updated = await ServiceForm.findByIdAndUpdate(id, { $set: payload }, { new: true, runValidators: true });
