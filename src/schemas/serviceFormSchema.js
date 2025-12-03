@@ -21,14 +21,14 @@ const serviceFormSchemas = {
           type: "string",
           enum: ["MeterReplacement", "Mutation", "Reconnection", "Tanker", "Disconnection"],
         },
-        department_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
+        department_id: { type: "string" },
         departmentName: { type: "string", minLength: 1 },
-        division_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
+        division_id: { type: "string"  },
         division_name: { type: "string", minLength: 1 },
-        collection_center_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
+        collection_center_id: { type: "string"  },
         collection_center_name: { type: "string", minLength: 1 },
         area_type: { type: "string", enum: ["Urban", "Rural"] },
-        consumer_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
+        consumer_id: { type: "string"  },
         consumerNumber: { type: "string", minLength: 1 },
 
         current_name: { type: "string", minLength: 1 },
@@ -119,7 +119,7 @@ const serviceFormSchemas = {
           data: {
             type: "object",
             properties: {
-              _id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
+              _id: { type: "string"  },
               serviceType: { type: "string" },
               consumerNumber: { type: "string" },
               current_name: { type: "string" },
@@ -140,7 +140,7 @@ const serviceFormSchemas = {
       type: "object",
       required: ["id"],
       properties: {
-        id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
+        id: { type: "string"  },
       },
       errorMessage: {
         required: { id: "ID is required" },
@@ -202,7 +202,7 @@ const serviceFormSchemas = {
       type: "object",
       required: ["id"],
       properties: {
-        id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
+        id: { type: "string"  },
       },
       errorMessage: {
         required: { id: "ID is required" },
@@ -287,9 +287,9 @@ const serviceFormSchemas = {
         assignedTo: { type: "string" },
         submittedBy: { type: "string" },
         is_paid: { type: "string", enum: ["true", "false", "All"] },
-        department_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
-        division_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
-        collection_center_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
+        department_id: { type: "string"  },
+        division_id: { type: "string"  },
+        collection_center_id: { type: "string"  },
         area_type: { type: "string", enum: ["Urban", "Rural"] },
       },
       additionalProperties: true,
@@ -350,7 +350,7 @@ const serviceFormSchemas = {
     params: {
       type: "object",
       required: ["id"],
-      properties: { id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" } },
+      properties: { id: { type: "string"  } },
       errorMessage: {
         required: { id: "ID is required" },
         properties: { id: "Invalid ID format (must be MongoDB ObjectId)" },
@@ -363,14 +363,14 @@ const serviceFormSchemas = {
           type: "string",
           enum: ["MeterReplacement", "Mutation", "Reconnection", "Tanker", "Disconnection"],
         },
-        department_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
+        department_id: { type: "string"  },
         departmentName: { type: "string" },
-        division_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
+        division_id: { type: "string"  },
         division_name: { type: "string" },
-        collection_center_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
+        collection_center_id: { type: "string"  },
         collection_center_name: { type: "string" },
         area_type: { type: "string", enum: ["Urban", "Rural"] },
-        consumer_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
+        consumer_id: { type: "string"  },
         consumerNumber: { type: "string" },
 
         current_name: { type: "string" },
@@ -447,16 +447,16 @@ const serviceFormSchemas = {
     params: {
       type: "object",
       required: ["id"],
-      properties: { id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" } },
+      properties: { id: { type: "string"  } },
     },
     body: {
       type: "object",
       properties: {
-        department_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
+        department_id: { type: "string"  },
         departmentName: { type: "string" },
-        division_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
+        division_id: { type: "string"  },
         division_name: { type: "string" },
-        collection_center_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
+        collection_center_id: { type: "string"  },
         collection_center_name: { type: "string" },
         area_type: { type: "string", enum: ["Urban", "Rural"] },
         current_name: { type: "string" },
@@ -525,7 +525,7 @@ const serviceFormSchemas = {
     params: {
       type: "object",
       required: ["id"],
-      properties: { id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" } },
+      properties: { id: { type: "string"  } },
       errorMessage: {
         required: { id: "ID is required" },
         properties: { id: "Invalid ID format (must be MongoDB ObjectId)" },
@@ -548,7 +548,7 @@ const serviceFormSchemas = {
       properties: {
         ids: {
           type: "array",
-          items: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
+          items: { type: "string"  },
           minItems: 1,
         },
       },
