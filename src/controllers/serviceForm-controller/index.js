@@ -241,6 +241,10 @@ export const updateServiceForm = async (request, reply) => {
     if (!isValidObjectId(id)) return reply.code(400).send({ success: false, message: 'Invalid id' });
 
     const payload = { ...request.body };
+    // Support `assignTo` alias from clients and persist as assignedTo
+    if (typeof payload.assignTo !== 'undefined' && typeof payload.assignedTo === 'undefined') {
+      payload.assignedTo = payload.assignTo;
+    }
     if (payload.current_mobileNumber) payload.current_mobileNumber = String(payload.current_mobileNumber).replace(/\D/g, '');
     if (payload.new_mobileNumber) payload.new_mobileNumber = String(payload.new_mobileNumber).replace(/\D/g, '');
     if (payload.department_id && isValidObjectId(payload.department_id)) payload.department_id = new Types.ObjectId(payload.department_id);
@@ -269,6 +273,10 @@ export const patchServiceForm = async (request, reply) => {
     if (!isValidObjectId(id)) return reply.code(400).send({ success: false, message: 'Invalid id' });
 
     const payload = { ...request.body };
+    // Support `assignTo` alias from clients and persist as assignedTo
+    if (typeof payload.assignTo !== 'undefined' && typeof payload.assignedTo === 'undefined') {
+      payload.assignedTo = payload.assignTo;
+    }
     if (payload.current_mobileNumber) payload.current_mobileNumber = String(payload.current_mobileNumber).replace(/\D/g, '');
     if (payload.new_mobileNumber) payload.new_mobileNumber = String(payload.new_mobileNumber).replace(/\D/g, '');
     if (payload.department_id && isValidObjectId(payload.department_id)) payload.department_id = new Types.ObjectId(payload.department_id);
