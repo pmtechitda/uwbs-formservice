@@ -46,8 +46,8 @@ export const getAllServiceForms = async (request, reply) => {
       { current_mobileNumber: mobileNumber },
       { new_mobileNumber: mobileNumber },
     ]);
-    if (assignedTo && isValidObjectId(assignedTo)) filter.assignedTo = assignedTo;
-    if (submittedBy && isValidObjectId(submittedBy)) filter.submittedBy = submittedBy;
+    if (assignedTo) filter.assignedTo = assignedTo;
+    if (submittedBy) filter.submittedBy = submittedBy;
     if (typeof is_paid !== 'undefined' && is_paid !== 'All') {
       if (is_paid === 'true' || is_paid === '1') filter.is_paid = true;
       else if (is_paid === 'false' || is_paid === '0') filter.is_paid = false;
@@ -121,7 +121,7 @@ export const createServiceForm = async (request, reply) => {
     if (payload.current_mobileNumber) payload.current_mobileNumber = String(payload.current_mobileNumber).replace(/\D/g, '');
     if (payload.new_mobileNumber) payload.new_mobileNumber = String(payload.new_mobileNumber).replace(/\D/g, '');
 
-    if (payload.consumer_id && isValidObjectId(payload.consumer_id)) payload.consumer_id = Types.ObjectId(payload.consumer_id);
+    if (payload.consumer_id && isValidObjectId(payload.consumer_id)) payload.consumer_id = new Types.ObjectId(payload.consumer_id);
 
     //update submittedBy and submittedType from auth info if available
     if (request.user) {
@@ -169,7 +169,7 @@ export const updateServiceForm = async (request, reply) => {
     const payload = { ...request.body };
     if (payload.current_mobileNumber) payload.current_mobileNumber = String(payload.current_mobileNumber).replace(/\D/g, '');
     if (payload.new_mobileNumber) payload.new_mobileNumber = String(payload.new_mobileNumber).replace(/\D/g, '');
-    if (payload.consumer_id && isValidObjectId(payload.consumer_id)) payload.consumer_id = Types.ObjectId(payload.consumer_id);
+    if (payload.consumer_id && isValidObjectId(payload.consumer_id)) payload.consumer_id = new Types.ObjectId(payload.consumer_id);
 
     const updated = await ServiceForm.findByIdAndUpdate(id, payload, { new: true, runValidators: true });
     if (!updated) return reply.code(404).send({ success: false, message: 'Not found' });
@@ -191,7 +191,7 @@ export const patchServiceForm = async (request, reply) => {
     const payload = { ...request.body };
     if (payload.current_mobileNumber) payload.current_mobileNumber = String(payload.current_mobileNumber).replace(/\D/g, '');
     if (payload.new_mobileNumber) payload.new_mobileNumber = String(payload.new_mobileNumber).replace(/\D/g, '');
-    if (payload.consumer_id && isValidObjectId(payload.consumer_id)) payload.consumer_id = Types.ObjectId(payload.consumer_id);
+    if (payload.consumer_id && isValidObjectId(payload.consumer_id)) payload.consumer_id = new Types.ObjectId(payload.consumer_id);
 
     const updated = await ServiceForm.findByIdAndUpdate(id, { $set: payload }, { new: true, runValidators: true });
     if (!updated) return reply.code(404).send({ success: false, message: 'Not found' });
@@ -228,7 +228,7 @@ export const bulkDeleteServiceForms = async (request, reply) => {
       return reply.code(400).send({ success: false, message: 'ids array required' });
     }
 
-    const validIds = ids.filter(isValidObjectId).map((i) => Types.ObjectId(i));
+    const validIds = ids.filter(isValidObjectId).map((i) => new Types.ObjectId(i));
     if (validIds.length === 0) {
       return reply.code(400).send({ success: false, message: 'No valid ids provided' });
     }

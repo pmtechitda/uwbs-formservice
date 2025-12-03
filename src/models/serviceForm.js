@@ -55,9 +55,25 @@ const serviceFormSchema = new Schema(
         // Status for all services
         status: {
             type: String,
-            enum: ["Approved", "Rejected", "Pending", "Draft"],
+            enum: ["Approved", "Rejected", "Pending", "Draft", "Processing"],
             default: "Draft",
         },
+
+        sub_status: { 
+            type: String,
+            enum: [
+                "Application Received",
+                "Under Verification",
+                "RO Forward to JE",
+                "JE Revert to RO",
+                "Under Inspection",
+                "Approved",
+                "Rejected",
+                "Pending Payment"
+            ], 
+            default: "Application Received" 
+        },
+
     },
     {
         timestamps: true,
