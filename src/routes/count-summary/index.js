@@ -25,7 +25,7 @@ export default async function meterReplacementRoutes(fastify, opts) {
       properties: {
         type: {
           type: "string",
-          enum: ["All", "MeterReplacement", "Mutation", "Reconnection", "Tanker"],
+          enum: ["All", "MeterReplacement", "Mutation", "Reconnection", "Tanker", "Disconnection"],
           default: "All",
         },
       },

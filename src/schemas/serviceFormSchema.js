@@ -19,7 +19,7 @@ const serviceFormSchemas = {
       properties: {
         serviceType: {
           type: "string",
-          enum: ["MeterReplacement", "Mutation", "Reconnection", "Tanker"],
+          enum: ["MeterReplacement", "Mutation", "Reconnection", "Tanker", "Disconnection"],
         },
         department_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
         departmentName: { type: "string", minLength: 1 },
@@ -281,7 +281,7 @@ const serviceFormSchemas = {
         sortOrder: { type: "string", enum: ["asc", "desc"], default: "desc" },
 
         status: { type: "string", enum: ["All", "Approved", "Rejected", "Pending", "Draft", "Processing"] },
-        serviceType: { type: "string", enum: ["All", "MeterReplacement", "Mutation", "Reconnection", "Tanker"] },
+        serviceType: { type: "string", enum: ["All", "MeterReplacement", "Mutation", "Reconnection", "Tanker", "Disconnection"] },
         consumerNumber: { type: "string" },
         mobileNumber: { type: "string", pattern: "^[0-9]{10}$" },
         assignedTo: { type: "string" },
@@ -361,7 +361,7 @@ const serviceFormSchemas = {
       properties: {
         serviceType: {
           type: "string",
-          enum: ["MeterReplacement", "Mutation", "Reconnection", "Tanker"],
+          enum: ["MeterReplacement", "Mutation", "Reconnection", "Tanker", "Disconnection"],
         },
         department_id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" },
         departmentName: { type: "string" },
