@@ -1,6 +1,7 @@
 import amqp from 'amqplib'
 import mongoose from 'mongoose'
 import ServiceForm from '../models/serviceForm.js'
+import FormTrack from '../models/formTrack.js'
 
 const QUEUE = 'service.status.update.request'
 
@@ -29,6 +30,44 @@ function buildUpdate(req = {}) {
   if (typeof req.is_paid === 'boolean') update.is_paid = req.is_paid
   else update.is_paid = true // payment-service triggers this after a successful payment
   return update
+}
+
+async function recordTrack(doc, action = 'StatusChange', { actedBy, comment } = {}) {
+  // mirror the tracking data used by the HTTP controllers
+  const historyEntry = {
+    status: doc.status,
+    sub_status: doc.sub_status,
+    assignedTo: doc.assignedTo,
+    action,
+    comment,
+    updatedBy: actedBy,
+    updatedAt: new Date(),
+  }
+
+  const applicationNo = doc.applicationNo || String(doc._id)
+  const setPayload = {
+    status: doc.status,
+    sub_status: doc.sub_status,
+    assignedTo: doc.assignedTo,
+    action,
+  }
+
+  if (comment) setPayload.comment = comment
+  if (actedBy) setPayload.actedBy = actedBy
+
+  await FormTrack.findOneAndUpdate(
+    { form_id: doc._id, applicationNo },
+    {
+      $setOnInsert: {
+        form_id: doc._id,
+        formName: 'ServiceForm',
+        applicationNo,
+      },
+      $set: setPayload,
+      $push: { statusHistory: historyEntry },
+    },
+    { new: true, upsert: true },
+  )
 }
 
 export default async function startServiceStatusConsumer() {
@@ -61,12 +100,42 @@ export default async function startServiceStatusConsumer() {
       try {
         const req = JSON.parse(msg.content.toString() || '{}')
         const query = buildQuery(req)
+        const incomingStatus = String(req.status || '').trim()
 
         if (!query) {
-          throw new Error('Missing serviceNumber/serviceFormId')
+          reply(
+            {
+              ok: false,
+              message: 'Please provide a service number or form id to update status.',
+              error: 'Missing serviceNumber/serviceFormId',
+            },
+            replyTo,
+            corr,
+          )
+          return
         }
-        if (!req.status) {
-          throw new Error('Missing status')
+        if (!incomingStatus) {
+          reply(
+            {
+              ok: false,
+              message: 'Status is required to update the service.',
+              error: 'Missing status',
+            },
+            replyTo,
+            corr,
+          )
+          return
+        }
+        if (incomingStatus.toLowerCase() === 'draft') {
+          reply(
+            {
+              ok: true,
+              message: 'Draft status from queue is ignored and not stored.',
+            },
+            replyTo,
+            corr,
+          )
+          return
         }
 
         const update = buildUpdate(req)
@@ -77,14 +146,29 @@ export default async function startServiceStatusConsumer() {
         ).lean()
 
         if (!doc) {
-          reply({ ok: false, error: 'Service form not found' }, replyTo, corr)
-          channel.ack(msg)
+          reply(
+            {
+              ok: false,
+              message: 'No service found for the provided reference.',
+              error: 'Service form not found',
+            },
+            replyTo,
+            corr,
+          )
           return
+        }
+
+        if (doc.status && doc.status !== 'Draft') {
+          await recordTrack(doc, 'StatusChange', {
+            actedBy: req.updatedBy || req.userId || doc.actedBy,
+            comment: req.comment,
+          })
         }
 
         reply(
           {
             ok: true,
+            message: 'Service status updated successfully.',
             data: {
               id: doc._id,
               status: doc.status,
@@ -97,7 +181,11 @@ export default async function startServiceStatusConsumer() {
         )
       } catch (err) {
         reply(
-          { ok: false, error: err?.message || 'Service status update failed' },
+          {
+            ok: false,
+            message: 'Unable to update the service status at the moment.',
+            error: err?.message || 'Service status update failed',
+          },
           replyTo,
           corr,
         )

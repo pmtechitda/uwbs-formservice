@@ -56,19 +56,51 @@ export default async function startServiceTrackConsumer() {
         const query = buildQuery(req);
 
         if (!query) {
-          throw new Error('Missing serviceNumber/serviceFormId');
+          reply(
+            {
+              ok: false,
+              message: 'Please provide a service number or form id to track the request.',
+              error: 'Missing serviceNumber/serviceFormId',
+            },
+            replyTo,
+            corr,
+          );
+          return;
         }
 
         const track = await FormTrack.findOne(query).lean();
         if (!track) {
-          reply({ ok: false, error: 'Service form track not found' }, replyTo, corr);
-          channel.ack(msg);
+          reply(
+            {
+              ok: false,
+              message: 'No tracking information found for the provided reference.',
+              error: 'Service form track not found',
+            },
+            replyTo,
+            corr,
+          );
           return;
         }
 
-        reply({ ok: true, data: track }, replyTo, corr);
+        reply(
+          {
+            ok: true,
+            message: 'Service tracking fetched successfully.',
+            data: track,
+          },
+          replyTo,
+          corr,
+        );
       } catch (err) {
-        reply({ ok: false, error: err?.message || 'Service form track fetch failed' }, replyTo, corr);
+        reply(
+          {
+            ok: false,
+            message: 'Unable to fetch service tracking at the moment.',
+            error: err?.message || 'Service form track fetch failed',
+          },
+          replyTo,
+          corr,
+        );
       } finally {
         channel.ack(msg);
       }
