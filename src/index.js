@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { connectRPC } from "./utils/rpcClient.js";
 import startServiceStatusConsumer from "./rpc/serviceStatusUpdate.js";
+import startServiceTrackConsumer from "./rpc/serviceTrackRequest.js";
 import masterRoutes from "./routes/master.routes.js";
 import authPlugin from "./plugins/auth.js";
 import errorHandler from "./utils/errorHandler.js";
@@ -46,6 +47,7 @@ async function start() {
     await mongoose.connect(process.env.MONGO_URI);
     await connectRPC();
     await startServiceStatusConsumer();
+    await startServiceTrackConsumer();
     errorHandler(fastify);
 
     const port = Number(process.env.PORT) || 3003;
