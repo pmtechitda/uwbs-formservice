@@ -81,9 +81,13 @@ export const getAllServiceForms = async (request, reply) => {
       ];
     }
 
-    if (typeof status !== 'undefined' && status !== 'All') filter.status = status;
-    // if status is all then remove Draft from results
-    if (status === 'All') filter.status = { $ne: 'Draft' };
+    const statusProvided = typeof status !== 'undefined' && status !== null && status !== '';
+    if (statusProvided && status !== 'All') {
+      filter.status = status;
+    } else {
+      // For status "All" or not provided, exclude Draft entries
+      filter.status = { $ne: 'Draft' };
+    }
     if (typeof serviceType !== 'undefined' && serviceType !== 'All') filter.serviceType = serviceType;
     if (consumerNumber) filter.consumerNumber = consumerNumber;
     if (mobileNumber) filter.$or = (filter.$or || []).concat([
