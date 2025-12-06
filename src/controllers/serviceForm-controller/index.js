@@ -5,6 +5,12 @@ import FormTrack from '../../models/formTrack.js';
 
 const { Types } = mongoose;
 const isValidObjectId = (id) => Types.ObjectId.isValid(id);
+const withApplicationNo = (doc) => {
+  if (!doc) return doc;
+  const raw = doc.toObject ? doc.toObject() : doc;
+  const applicationNo = raw.applicationNo || String(raw._id || raw.form_id || '');
+  return { ...raw, applicationNo };
+};
 
 // Append a status history entry and keep latest snapshot for tracking UI
 const recordTrack = async (formDoc, action = 'Update', userId, comment) => {
@@ -111,12 +117,13 @@ export const getAllServiceForms = async (request, reply) => {
       ServiceForm.find(filter).sort(sort).skip((pageNum - 1) * perPage).limit(perPage).lean(),
       ServiceForm.countDocuments(filter),
     ]);
+    const serviceForms = items.map(withApplicationNo);
 
     return reply.code(200).send({
       success: true,
       message: 'Service forms fetched',
       data: {
-        serviceForms: items,
+        serviceForms,
         pagination: {
           total,
           page: pageNum,
@@ -145,11 +152,13 @@ export const getServiceFormById = async (request, reply) => {
       FormTrack.findOne({ form_id: id }).lean(),
     ]);
     if (!doc) return reply.code(404).send({ success: false, message: 'Not found' });
+    const docWithApp = withApplicationNo(doc);
+    const trackWithApp = withApplicationNo(track);
 
     return reply.code(200).send({
       success: true,
       message: 'Service form fetched',
-      data: { ...doc, track },
+      data: { ...docWithApp, track: trackWithApp },
     });
   } catch (err) {
     request.log?.error?.(err);
@@ -171,9 +180,9 @@ export const getServiceFormByConsumerNumber = async (request, reply) => {
     const tracks = formIds.length
       ? await FormTrack.find({ form_id: { $in: formIds } }).lean()
       : [];
-    const trackMap = new Map(tracks.map((t) => [String(t.form_id), t]));
+    const trackMap = new Map(tracks.map((t) => [String(t.form_id), withApplicationNo(t)]));
     const dataWithTrack = docs.map((doc) => ({
-      ...doc,
+      ...withApplicationNo(doc),
       track: trackMap.get(String(doc._id)) || null,
     }));
 
@@ -227,7 +236,7 @@ export const createServiceForm = async (request, reply) => {
 
     await recordTrack(saved, 'Created', request.user?.id);
 
-    return reply.code(201).send({ success: true, message: 'Created', data: saved });
+    return reply.code(201).send({ success: true, message: 'Created', data: withApplicationNo(saved) });
   } catch (err) {
     request.log?.error?.(err);
     if (err.name === 'ValidationError') {
@@ -261,7 +270,7 @@ export const updateServiceForm = async (request, reply) => {
 
     await recordTrack(updated, 'Update', request.user?.id);
 
-    return reply.code(200).send({ success: true, message: 'Updated', data: updated });
+    return reply.code(200).send({ success: true, message: 'Updated', data: withApplicationNo(updated) });
   } catch (err) {
     request.log?.error?.(err);
     if (err.name === 'ValidationError') return reply.code(400).send({ success: false, message: err.message, errors: err.errors });
@@ -293,7 +302,7 @@ export const patchServiceForm = async (request, reply) => {
 
     await recordTrack(updated, 'Update', request.user?.id);
 
-    return reply.code(200).send({ success: true, message: 'Patched', data: updated });
+    return reply.code(200).send({ success: true, message: 'Patched', data: withApplicationNo(updated) });
   } catch (err) {
     request.log?.error?.(err);
     if (err.name === 'ValidationError') return reply.code(400).send({ success: false, message: err.message, errors: err.errors });
@@ -311,7 +320,7 @@ export const getServiceFormTrack = async (request, reply) => {
     const track = await FormTrack.findOne({ form_id: id }).lean();
     if (!track) return reply.code(404).send({ success: false, message: 'No tracking info found' });
 
-    return reply.code(200).send({ success: true, message: 'Tracking fetched', data: track });
+    return reply.code(200).send({ success: true, message: 'Tracking fetched', data: withApplicationNo(track) });
   } catch (err) {
     request.log?.error?.(err);
     return reply.code(500).send({ success: false, message: 'Server error' });
@@ -328,7 +337,12 @@ export const deleteServiceForm = async (request, reply) => {
     const deleted = await ServiceForm.findByIdAndDelete(id);
     if (!deleted) return reply.code(404).send({ success: false, message: 'Not found' });
 
-    return reply.code(200).send({ success: true, message: 'Deleted' });
+    const deletedWithAppNo = withApplicationNo(deleted);
+    return reply.code(200).send({
+      success: true,
+      message: 'Deleted',
+      data: { applicationNo: deletedWithAppNo.applicationNo },
+    });
   } catch (err) {
     request.log?.error?.(err);
     return reply.code(500).send({ success: false, message: 'Server error' });
@@ -349,9 +363,16 @@ export const bulkDeleteServiceForms = async (request, reply) => {
       return reply.code(400).send({ success: false, message: 'No valid ids provided' });
     }
 
+    const formsToDelete = await ServiceForm.find({ _id: { $in: validIds } }, 'applicationNo').lean();
+    const applicationNos = formsToDelete.map((doc) => withApplicationNo(doc).applicationNo);
     const result = await ServiceForm.deleteMany({ _id: { $in: validIds } });
 
-    return reply.code(200).send({ success: true, message: 'Bulk delete completed', deletedCount: result.deletedCount });
+    return reply.code(200).send({
+      success: true,
+      message: 'Bulk delete completed',
+      deletedCount: result.deletedCount,
+      applicationNos,
+    });
   } catch (err) {
     request.log?.error?.(err);
     return reply.code(500).send({ success: false, message: 'Server error' });
