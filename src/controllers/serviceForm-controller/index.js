@@ -5,11 +5,11 @@ import FormTrack from '../../models/formTrack.js';
 
 const { Types } = mongoose;
 const isValidObjectId = (id) => Types.ObjectId.isValid(id);
-const withApplicationNo = (doc) => {
+const withApplicationNumber = (doc) => {
   if (!doc) return doc;
   const raw = doc.toObject ? doc.toObject() : doc;
-  const applicationNo = raw.applicationNo || String(raw._id || raw.form_id || '');
-  return { ...raw, applicationNo };
+  const applicationNumber = raw.applicationNumber || String(raw._id || raw.form_id || '');
+  return { ...raw, applicationNumber };
 };
 
 // Append a status history entry and keep latest snapshot for tracking UI
@@ -24,15 +24,15 @@ const recordTrack = async (formDoc, action = 'Update', userId, comment) => {
     updatedAt: new Date(),
   };
 
-  const applicationNo = formDoc.applicationNo || String(formDoc._id);
+  const applicationNumber = formDoc.applicationNumber || String(formDoc._id);
 
   await FormTrack.findOneAndUpdate(
-    { form_id: formDoc._id, applicationNo },
+    { form_id: formDoc._id, applicationNumber },
     {
       $setOnInsert: {
         form_id: formDoc._id,
         formName: 'ServiceForm',
-        applicationNo,
+        applicationNumber,
       },
       $set: {
         status: formDoc.status,
@@ -62,7 +62,7 @@ export const getAllServiceForms = async (request, reply) => {
       serviceType,
       consumerNumber,
       mobileNumber,
-      applicationNo,
+      applicationNumber,
       assignedTo,
       submittedBy,
       department_id,
@@ -82,19 +82,18 @@ export const getAllServiceForms = async (request, reply) => {
     if (q) {
       const regex = new RegExp(q, 'i');
       filter.$or = [
-        { applicationNo: regex },
+        { applicationNumber: regex },
         { consumerNumber: regex },
         { current_name: regex },
         { new_name: regex },
       ];
     }
-    if (applicationNo) filter.applicationNo = applicationNo;
+    if (applicationNumber) filter.applicationNumber = applicationNumber;
 
     const statusProvided = typeof status !== 'undefined' && status !== null && status !== '';
     if (statusProvided && status !== 'All') {
       filter.status = status;
     } else {
-      // For status "All" or not provided, exclude Draft entries
       filter.status = { $ne: 'Draft' };
     }
     if (typeof serviceType !== 'undefined' && serviceType !== 'All') filter.serviceType = serviceType;
@@ -120,7 +119,7 @@ export const getAllServiceForms = async (request, reply) => {
       ServiceForm.find(filter).sort(sort).skip((pageNum - 1) * perPage).limit(perPage).lean(),
       ServiceForm.countDocuments(filter),
     ]);
-    const serviceForms = items.map(withApplicationNo);
+    const serviceForms = items.map(withApplicationNumber);
 
     return reply.code(200).send({
       success: true,
@@ -155,8 +154,8 @@ export const getServiceFormById = async (request, reply) => {
       FormTrack.findOne({ form_id: id }).lean(),
     ]);
     if (!doc) return reply.code(404).send({ success: false, message: 'Not found' });
-    const docWithApp = withApplicationNo(doc);
-    const trackWithApp = withApplicationNo(track);
+    const docWithApp = withApplicationNumber(doc);
+    const trackWithApp = withApplicationNumber(track);
 
     return reply.code(200).send({
       success: true,
@@ -183,9 +182,9 @@ export const getServiceFormByConsumerNumber = async (request, reply) => {
     const tracks = formIds.length
       ? await FormTrack.find({ form_id: { $in: formIds } }).lean()
       : [];
-    const trackMap = new Map(tracks.map((t) => [String(t.form_id), withApplicationNo(t)]));
+    const trackMap = new Map(tracks.map((t) => [String(t.form_id), withApplicationNumber(t)]));
     const dataWithTrack = docs.map((doc) => ({
-      ...withApplicationNo(doc),
+      ...withApplicationNumber(doc),
       track: trackMap.get(String(doc._id)) || null,
     }));
 
@@ -215,23 +214,22 @@ export const createServiceForm = async (request, reply) => {
       payload.submittedBy = request.user.id;
     }
 
-    // Generate unique applicationNo UWBS(M)YYMM(7 digit unique number timestam) M depand on this  enum: ["MeterReplacement", "Mutation", "Reconnection", "Tanker"],
+    // Generate unique applicationNumber UWBS(M)YYMM + 7 digit sequence
     const now = new Date();
     const year = String(now.getFullYear()).slice(-2);
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const prefix = `UWBS${payload.serviceType.charAt(0)}-${year}${month}`;
-    const lastForm = await ServiceForm
-        .findOne({ applicationNo: { $regex: `^${prefix}` } })
-        .sort({ applicationNo: -1 })
-        .lean();
+    const lastForm = await ServiceForm.findOne({ applicationNumber: { $regex: `^${prefix}` } })
+      .sort({ applicationNumber: -1 })
+      .lean();
     let uniqueNumber = 1;
     if (lastForm) {
-        const lastNumber = parseInt(lastForm.applicationNo.slice(-7), 10);
-        if (!isNaN(lastNumber)) {
-            uniqueNumber = lastNumber + 1;
-        }
+      const lastNumber = parseInt(lastForm.applicationNumber.slice(-7), 10);
+      if (!Number.isNaN(lastNumber)) {
+        uniqueNumber = lastNumber + 1;
+      }
     }
-    payload.applicationNo = `${prefix}${String(uniqueNumber).padStart(7, '0')}`;
+    payload.applicationNumber = `${prefix}${String(uniqueNumber).padStart(7, '0')}`;
     
 
     const doc = new ServiceForm(payload);
@@ -239,7 +237,7 @@ export const createServiceForm = async (request, reply) => {
 
     await recordTrack(saved, 'Created', request.user?.id);
 
-    return reply.code(201).send({ success: true, message: 'Created', data: withApplicationNo(saved) });
+    return reply.code(201).send({ success: true, message: 'Created', data: withApplicationNumber(saved) });
   } catch (err) {
     request.log?.error?.(err);
     if (err.name === 'ValidationError') {
@@ -273,7 +271,7 @@ export const updateServiceForm = async (request, reply) => {
 
     await recordTrack(updated, 'Update', request.user?.id);
 
-    return reply.code(200).send({ success: true, message: 'Updated', data: withApplicationNo(updated) });
+    return reply.code(200).send({ success: true, message: 'Updated', data: withApplicationNumber(updated) });
   } catch (err) {
     request.log?.error?.(err);
     if (err.name === 'ValidationError') return reply.code(400).send({ success: false, message: err.message, errors: err.errors });
@@ -305,7 +303,7 @@ export const patchServiceForm = async (request, reply) => {
 
     await recordTrack(updated, 'Update', request.user?.id);
 
-    return reply.code(200).send({ success: true, message: 'Patched', data: withApplicationNo(updated) });
+    return reply.code(200).send({ success: true, message: 'Patched', data: withApplicationNumber(updated) });
   } catch (err) {
     request.log?.error?.(err);
     if (err.name === 'ValidationError') return reply.code(400).send({ success: false, message: err.message, errors: err.errors });
@@ -323,7 +321,7 @@ export const getServiceFormTrack = async (request, reply) => {
     const track = await FormTrack.findOne({ form_id: id }).lean();
     if (!track) return reply.code(404).send({ success: false, message: 'No tracking info found' });
 
-    return reply.code(200).send({ success: true, message: 'Tracking fetched', data: withApplicationNo(track) });
+    return reply.code(200).send({ success: true, message: 'Tracking fetched', data: withApplicationNumber(track) });
   } catch (err) {
     request.log?.error?.(err);
     return reply.code(500).send({ success: false, message: 'Server error' });
@@ -340,11 +338,11 @@ export const deleteServiceForm = async (request, reply) => {
     const deleted = await ServiceForm.findByIdAndDelete(id);
     if (!deleted) return reply.code(404).send({ success: false, message: 'Not found' });
 
-    const deletedWithAppNo = withApplicationNo(deleted);
+    const deletedWithAppNo = withApplicationNumber(deleted);
     return reply.code(200).send({
       success: true,
       message: 'Deleted',
-      data: { applicationNo: deletedWithAppNo.applicationNo },
+      data: { applicationNumber: deletedWithAppNo.applicationNumber },
     });
   } catch (err) {
     request.log?.error?.(err);
@@ -366,15 +364,15 @@ export const bulkDeleteServiceForms = async (request, reply) => {
       return reply.code(400).send({ success: false, message: 'No valid ids provided' });
     }
 
-    const formsToDelete = await ServiceForm.find({ _id: { $in: validIds } }, 'applicationNo').lean();
-    const applicationNos = formsToDelete.map((doc) => withApplicationNo(doc).applicationNo);
+    const formsToDelete = await ServiceForm.find({ _id: { $in: validIds } }, 'applicationNumber').lean();
+    const applicationNumbers = formsToDelete.map((doc) => withApplicationNumber(doc).applicationNumber);
     const result = await ServiceForm.deleteMany({ _id: { $in: validIds } });
 
     return reply.code(200).send({
       success: true,
       message: 'Bulk delete completed',
       deletedCount: result.deletedCount,
-      applicationNos,
+      applicationNumbers,
     });
   } catch (err) {
     request.log?.error?.(err);

@@ -18,7 +18,7 @@ function buildQuery(req = {}) {
     if (isObjectId(serviceNumber)) {
       return { _id: new mongoose.Types.ObjectId(serviceNumber) }
     }
-    return { applicationNo: String(serviceNumber) }
+    return { applicationNumber: String(serviceNumber) }
   }
   return null
 }
@@ -44,7 +44,7 @@ async function recordTrack(doc, action = 'StatusChange', { actedBy, comment } = 
     updatedAt: new Date(),
   }
 
-  const applicationNo = doc.applicationNo || String(doc._id)
+  const applicationNumber = doc.applicationNumber || String(doc._id)
   const setPayload = {
     status: doc.status,
     sub_status: doc.sub_status,
@@ -56,12 +56,12 @@ async function recordTrack(doc, action = 'StatusChange', { actedBy, comment } = 
   if (actedBy) setPayload.actedBy = actedBy
 
   await FormTrack.findOneAndUpdate(
-    { form_id: doc._id, applicationNo },
+    { form_id: doc._id, applicationNumber },
     {
       $setOnInsert: {
         form_id: doc._id,
         formName: 'ServiceForm',
-        applicationNo,
+        applicationNumber,
       },
       $set: setPayload,
       $push: { statusHistory: historyEntry },
@@ -158,8 +158,8 @@ export default async function startServiceStatusConsumer() {
           return
         }
 
-        const applicationNo = doc.applicationNo || String(doc._id)
-        if (!doc.applicationNo) doc.applicationNo = applicationNo
+        const applicationNumber = doc.applicationNumber || String(doc._id)
+        if (!doc.applicationNumber) doc.applicationNumber = applicationNumber
 
         if (doc.status && doc.status !== 'Draft') {
           await recordTrack(doc, 'StatusChange', {
@@ -174,7 +174,7 @@ export default async function startServiceStatusConsumer() {
             message: 'Service status updated successfully.',
             data: {
               id: doc._id,
-              applicationNo,
+              applicationNumber,
               status: doc.status,
               sub_status: doc.sub_status,
               is_paid: doc.is_paid,

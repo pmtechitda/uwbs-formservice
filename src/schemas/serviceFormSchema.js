@@ -155,7 +155,7 @@ const serviceFormSchemas = {
             type: "object",
             properties: {
               _id: { type: "string"  },
-              applicationNo: { type: "string" },
+               applicationNumber: { type: "string" },
               serviceType: { type: "string" },
               consumerNumber: { type: "string" },
               current_name: { type: "string" },
@@ -193,7 +193,7 @@ const serviceFormSchemas = {
             type: "object",
             properties: {
               _id: { type: "string" },
-              applicationNo: { type: "string" },
+               applicationNumber: { type: "string" },
               serviceType: { type: "string" },
               consumerNumber: { type: "string" },
               consumer_id: { type: "string" },
@@ -228,7 +228,7 @@ const serviceFormSchemas = {
                 anyOf: [
                   {
                     type: "object",
-                    properties: { applicationNo: { type: "string" } },
+                    properties: {  applicationNumber: { type: "string" } },
                     additionalProperties: true,
                   },
                   { type: "null" },
@@ -265,7 +265,7 @@ const serviceFormSchemas = {
           data: {
             type: "object",
             properties: {
-              applicationNo: { type: "string" },
+               applicationNumber: { type: "string" },
               form_id: { type: "string" },
               status: { type: "string" },
               sub_status: { type: "string" },
@@ -302,7 +302,7 @@ const serviceFormSchemas = {
                 type: "object",
                 properties: {
                   _id: { type: "string" },
-                  applicationNo: { type: "string" },
+                   applicationNumber: { type: "string" },
                   serviceType: { type: "string" },
                   consumerNumber: { type: "string" },
                   current_name: { type: "string" },
@@ -315,7 +315,7 @@ const serviceFormSchemas = {
                   anyOf: [
                     {
                       type: "object",
-                      properties: { applicationNo: { type: "string" } },
+                      properties: {  applicationNumber: { type: "string" } },
                       additionalProperties: true,
                     },
                     { type: "null" },
@@ -346,7 +346,7 @@ const serviceFormSchemas = {
 
         status: { type: "string", enum: ["All", "Approved", "Rejected", "Pending", "Draft", "Processing"] },
         serviceType: { type: "string", enum: ["All", "MeterReplacement", "Mutation", "Reconnection", "Tanker", "Disconnection"] },
-        applicationNo: { type: "string" },
+         applicationNumber: { type: "string" },
         q: { type: "string" },
         consumerNumber: { type: "string" },
         mobileNumber: { type: "string", pattern: "^[0-9]{10}$" },
@@ -384,7 +384,7 @@ const serviceFormSchemas = {
                   type: "object",
                   properties: {
                     _id: { type: "string" },
-                    applicationNo: { type: "string" },
+                     applicationNumber: { type: "string" },
                     serviceType: { type: "string" },
                     consumerNumber: { type: "string" },
                     current_name: { type: "string" },
@@ -534,7 +534,7 @@ const serviceFormSchemas = {
             type: "object",
             properties: {
               _id: { type: "string" },
-              applicationNo: { type: "string" },
+               applicationNumber: { type: "string" },
               updatedAt: { type: "string", format: "date-time" },
             },
             additionalProperties: true,
@@ -646,7 +646,7 @@ const serviceFormSchemas = {
             type: "object",
             properties: {
               _id: { type: "string" },
-              applicationNo: { type: "string" },
+               applicationNumber: { type: "string" },
               updatedAt: { type: "string", format: "date-time" },
             },
           },
@@ -675,7 +675,7 @@ const serviceFormSchemas = {
           message: { type: "string" },
           data: {
             type: "object",
-            properties: { applicationNo: { type: "string" } },
+            properties: {  applicationNumber: { type: "string" } },
             additionalProperties: false,
           },
         },
@@ -705,7 +705,7 @@ const serviceFormSchemas = {
           success: { type: "boolean" },
           message: { type: "string" },
           deletedCount: { type: "integer" },
-          applicationNos: {
+           applicationNumbers: {
             type: "array",
             items: { type: "string" },
           },
