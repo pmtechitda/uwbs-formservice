@@ -3,6 +3,11 @@ import mongoose from 'mongoose';
 import FormTrack from '../models/formTrack.js';
 
 const QUEUE = 'service.track.request';
+const withApplicationNo = (doc) => {
+  if (!doc) return doc;
+  const applicationNo = doc.applicationNo || String(doc._id || doc.form_id || '');
+  return { ...doc, applicationNo };
+};
 
 function buildQuery(req = {}) {
   const { serviceFormId, serviceNumber } = req;
@@ -86,7 +91,7 @@ export default async function startServiceTrackConsumer() {
           {
             ok: true,
             message: 'Service tracking fetched successfully.',
-            data: track,
+            data: withApplicationNo(track),
           },
           replyTo,
           corr,

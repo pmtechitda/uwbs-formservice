@@ -62,6 +62,7 @@ export const getAllServiceForms = async (request, reply) => {
       serviceType,
       consumerNumber,
       mobileNumber,
+      applicationNo,
       assignedTo,
       submittedBy,
       department_id,
@@ -81,11 +82,13 @@ export const getAllServiceForms = async (request, reply) => {
     if (q) {
       const regex = new RegExp(q, 'i');
       filter.$or = [
+        { applicationNo: regex },
         { consumerNumber: regex },
         { current_name: regex },
         { new_name: regex },
       ];
     }
+    if (applicationNo) filter.applicationNo = applicationNo;
 
     const statusProvided = typeof status !== 'undefined' && status !== null && status !== '';
     if (statusProvided && status !== 'All') {

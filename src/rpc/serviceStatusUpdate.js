@@ -158,6 +158,9 @@ export default async function startServiceStatusConsumer() {
           return
         }
 
+        const applicationNo = doc.applicationNo || String(doc._id)
+        if (!doc.applicationNo) doc.applicationNo = applicationNo
+
         if (doc.status && doc.status !== 'Draft') {
           await recordTrack(doc, 'StatusChange', {
             actedBy: req.updatedBy || req.userId || doc.actedBy,
@@ -171,6 +174,7 @@ export default async function startServiceStatusConsumer() {
             message: 'Service status updated successfully.',
             data: {
               id: doc._id,
+              applicationNo,
               status: doc.status,
               sub_status: doc.sub_status,
               is_paid: doc.is_paid,

@@ -9,7 +9,7 @@ const serviceFormSchema = new Schema(
 
         serviceType: {
             type: String,
-            enum: ["MeterReplacement", "Mutation", "Reconnection", "Tanker", "Disconnection"],
+            enum: ["MeterReplacement", "Mutation", "Reconnection", "Tanker", "Disconnection", "Address Change", "Mobile Update", "Connection Change", "Meter Size Update"],
             required: true,
         },
 
@@ -17,7 +17,7 @@ const serviceFormSchema = new Schema(
         departmentName: { type: String, required: true },
         division_id: { type: Types.ObjectId, required: true },
         division_name: { type: String, required: true },
-        collection_center_id: { type: Types.ObjectId},
+        collection_center_id: { type: Types.ObjectId },
         collection_center_name: { type: String },
         area_type: { type: String, enum: ["Urban", "Rural"] },
 
@@ -33,12 +33,50 @@ const serviceFormSchema = new Schema(
             match: [/^[0-9]{10}$/, "Invalid mobile number"],
         },
 
+        current_address: { type: String, trim: true },
+        current_district: { type: String, trim: true },
+        current_area: { type: String, trim: true },
+        current_muncapilty_type: { type: String, trim: true },
+        current_munciplaty: { type: String, trim: true },
+        current_ward: { type: String, trim: true },
+        current_block: { type: String, trim: true },
+        current_grampanchayt: { type: String, trim: true },
+        current_village: { type: String, trim: true },
+
+        new_address: { type: String, trim: true },
+        new_district: { type: String, trim: true },
+        new_area: { type: String, trim: true },
+        new_muncapilty_type: { type: String, trim: true },
+        new_munciplaty: { type: String, trim: true },
+        new_ward: { type: String, trim: true },
+        new_block: { type: String, trim: true },
+        new_grampanchayt: { type: String, trim: true },
+        new_village: { type: String, trim: true },
+
+
         new_name: { type: String, trim: true },
         new_fatherName: { type: String, trim: true },
         new_mobileNumber: {
             type: String,
             match: [/^[0-9]{10}$/, "Invalid mobile number"],
         },
+
+        disconnection_date: { type: Date },
+        reconnection_date: { type: Date },
+
+        meter_number: { type: String, trim: true },
+        meter_size: { type: String, trim: true },
+        meter_location: { type: String, trim: true },
+
+        old_meter_size: { type: String, trim: true },
+        new_meter_size: { type: String, trim: true },
+
+        tanker_date: { type: Date },
+        tanker_time: { type: String, trim: true },
+        tanker_quantity: { type: String, trim: true },
+
+        old_connection_category: { type: String, trim: true },
+        new_connection_category: { type: String, trim: true },
 
         reason: { type: String, trim: true },
         documents: {
@@ -48,7 +86,7 @@ const serviceFormSchema = new Schema(
             stampPaper: { type: String },
         },
 
-        is_paid: { type: Boolean, default: false },        
+        is_paid: { type: Boolean, default: false },
         previousAmount: { type: String },
         charges: { type: String },
         otherCharges: { type: String },
@@ -66,7 +104,7 @@ const serviceFormSchema = new Schema(
             default: "Draft",
         },
 
-        sub_status: { 
+        sub_status: {
             type: String,
             enum: [
                 "Draft",
@@ -80,14 +118,9 @@ const serviceFormSchema = new Schema(
                 "Pending Payment",
                 "AE Forward to EE",
                 "EE Forward to SE"
-            ], 
-            default: "Draft" 
+            ],
+            default: "Draft"
         },
-
-
-
-
-
     },
     {
         timestamps: true,

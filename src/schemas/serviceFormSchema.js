@@ -34,12 +34,45 @@ const serviceFormSchemas = {
         current_name: { type: "string", minLength: 1 },
         current_fatherName: { type: "string" },
         current_mobileNumber: { type: "string", pattern: "^[0-9]{10}$" },
+        current_address: { type: "string" },
+        current_district: { type: "string" },
+        current_area: { type: "string" },
+        current_muncapilty_type: { type: "string" },
+        current_munciplaty: { type: "string" },
+        current_ward: { type: "string" },
+        current_block: { type: "string" },
+        current_grampanchayt: { type: "string" },
+        current_village: { type: "string" },
 
         new_name: { type: "string" },
         new_fatherName: { type: "string" },
         new_mobileNumber: { type: "string", pattern: "^[0-9]{10}$" },
+        new_address: { type: "string" },
+        new_district: { type: "string" },
+        new_area: { type: "string" },
+        new_muncapilty_type: { type: "string" },
+        new_munciplaty: { type: "string" },
+        new_ward: { type: "string" },
+        new_block: { type: "string" },
+        new_grampanchayt: { type: "string" },
+        new_village: { type: "string" },
 
         reason: { type: "string" },
+        disconnection_date: { type: "string", format: "date-time" },
+        reconnection_date: { type: "string", format: "date-time" },
+
+        meter_number: { type: "string" },
+        meter_size: { type: "string" },
+        meter_location: { type: "string" },
+        old_meter_size: { type: "string" },
+        new_meter_size: { type: "string" },
+
+        tanker_date: { type: "string", format: "date-time" },
+        tanker_time: { type: "string" },
+        tanker_quantity: { type: "string" },
+
+        old_connection_category: { type: "string" },
+        new_connection_category: { type: "string" },
 
         documents: {
           type: "object",
@@ -122,6 +155,7 @@ const serviceFormSchemas = {
             type: "object",
             properties: {
               _id: { type: "string"  },
+              applicationNo: { type: "string" },
               serviceType: { type: "string" },
               consumerNumber: { type: "string" },
               current_name: { type: "string" },
@@ -159,6 +193,7 @@ const serviceFormSchemas = {
             type: "object",
             properties: {
               _id: { type: "string" },
+              applicationNo: { type: "string" },
               serviceType: { type: "string" },
               consumerNumber: { type: "string" },
               consumer_id: { type: "string" },
@@ -191,7 +226,11 @@ const serviceFormSchemas = {
               updatedAt: { type: "string", format: "date-time" },
               track: {
                 anyOf: [
-                  { type: "object", additionalProperties: true },
+                  {
+                    type: "object",
+                    properties: { applicationNo: { type: "string" } },
+                    additionalProperties: true,
+                  },
                   { type: "null" },
                 ],
               },
@@ -225,6 +264,12 @@ const serviceFormSchemas = {
           message: { type: "string" },
           data: {
             type: "object",
+            properties: {
+              applicationNo: { type: "string" },
+              form_id: { type: "string" },
+              status: { type: "string" },
+              sub_status: { type: "string" },
+            },
             additionalProperties: true,
           },
         },
@@ -254,12 +299,13 @@ const serviceFormSchemas = {
           data: {
             type: "array",
             items: {
-              type: "object",
-              properties: {
-                _id: { type: "string" },
-                serviceType: { type: "string" },
-                consumerNumber: { type: "string" },
-                current_name: { type: "string" },
+                type: "object",
+                properties: {
+                  _id: { type: "string" },
+                  applicationNo: { type: "string" },
+                  serviceType: { type: "string" },
+                  consumerNumber: { type: "string" },
+                  current_name: { type: "string" },
                 current_mobileNumber: { type: "string" },
                 assignedTo: { type: "string" },
                 status: { type: "string" },
@@ -267,7 +313,11 @@ const serviceFormSchemas = {
                 updatedAt: { type: "string", format: "date-time" },
                 track: {
                   anyOf: [
-                    { type: "object", additionalProperties: true },
+                    {
+                      type: "object",
+                      properties: { applicationNo: { type: "string" } },
+                      additionalProperties: true,
+                    },
                     { type: "null" },
                   ],
                 },
@@ -296,6 +346,8 @@ const serviceFormSchemas = {
 
         status: { type: "string", enum: ["All", "Approved", "Rejected", "Pending", "Draft", "Processing"] },
         serviceType: { type: "string", enum: ["All", "MeterReplacement", "Mutation", "Reconnection", "Tanker", "Disconnection"] },
+        applicationNo: { type: "string" },
+        q: { type: "string" },
         consumerNumber: { type: "string" },
         mobileNumber: { type: "string", pattern: "^[0-9]{10}$" },
         assignedTo: { type: "string" },
@@ -332,6 +384,7 @@ const serviceFormSchemas = {
                   type: "object",
                   properties: {
                     _id: { type: "string" },
+                    applicationNo: { type: "string" },
                     serviceType: { type: "string" },
                     consumerNumber: { type: "string" },
                     current_name: { type: "string" },
@@ -390,12 +443,45 @@ const serviceFormSchemas = {
         current_name: { type: "string" },
         current_fatherName: { type: "string" },
         current_mobileNumber: { type: "string", pattern: "^[0-9]{10}$" },
+        current_address: { type: "string" },
+        current_district: { type: "string" },
+        current_area: { type: "string" },
+        current_muncapilty_type: { type: "string" },
+        current_munciplaty: { type: "string" },
+        current_ward: { type: "string" },
+        current_block: { type: "string" },
+        current_grampanchayt: { type: "string" },
+        current_village: { type: "string" },
 
         new_name: { type: "string" },
         new_fatherName: { type: "string" },
         new_mobileNumber: { type: "string", pattern: "^[0-9]{10}$" },
+        new_address: { type: "string" },
+        new_district: { type: "string" },
+        new_area: { type: "string" },
+        new_muncapilty_type: { type: "string" },
+        new_munciplaty: { type: "string" },
+        new_ward: { type: "string" },
+        new_block: { type: "string" },
+        new_grampanchayt: { type: "string" },
+        new_village: { type: "string" },
 
         reason: { type: "string" },
+        disconnection_date: { type: "string", format: "date-time" },
+        reconnection_date: { type: "string", format: "date-time" },
+
+        meter_number: { type: "string" },
+        meter_size: { type: "string" },
+        meter_location: { type: "string" },
+        old_meter_size: { type: "string" },
+        new_meter_size: { type: "string" },
+
+        tanker_date: { type: "string", format: "date-time" },
+        tanker_time: { type: "string" },
+        tanker_quantity: { type: "string" },
+
+        old_connection_category: { type: "string" },
+        new_connection_category: { type: "string" },
 
         documents: {
           type: "object",
@@ -448,6 +534,7 @@ const serviceFormSchemas = {
             type: "object",
             properties: {
               _id: { type: "string" },
+              applicationNo: { type: "string" },
               updatedAt: { type: "string", format: "date-time" },
             },
             additionalProperties: true,
@@ -478,10 +565,40 @@ const serviceFormSchemas = {
         current_name: { type: "string" },
         current_fatherName: { type: "string" },
         current_mobileNumber: { type: "string", pattern: "^[0-9]{10}$" },
+        current_address: { type: "string" },
+        current_district: { type: "string" },
+        current_area: { type: "string" },
+        current_muncapilty_type: { type: "string" },
+        current_munciplaty: { type: "string" },
+        current_ward: { type: "string" },
+        current_block: { type: "string" },
+        current_grampanchayt: { type: "string" },
+        current_village: { type: "string" },
         new_name: { type: "string" },
         new_fatherName: { type: "string" },
         new_mobileNumber: { type: "string", pattern: "^[0-9]{10}$" },
+        new_address: { type: "string" },
+        new_district: { type: "string" },
+        new_area: { type: "string" },
+        new_muncapilty_type: { type: "string" },
+        new_munciplaty: { type: "string" },
+        new_ward: { type: "string" },
+        new_block: { type: "string" },
+        new_grampanchayt: { type: "string" },
+        new_village: { type: "string" },
         reason: { type: "string" },
+        disconnection_date: { type: "string", format: "date-time" },
+        reconnection_date: { type: "string", format: "date-time" },
+        meter_number: { type: "string" },
+        meter_size: { type: "string" },
+        meter_location: { type: "string" },
+        old_meter_size: { type: "string" },
+        new_meter_size: { type: "string" },
+        tanker_date: { type: "string", format: "date-time" },
+        tanker_time: { type: "string" },
+        tanker_quantity: { type: "string" },
+        old_connection_category: { type: "string" },
+        new_connection_category: { type: "string" },
         documents: {
           type: "object",
           properties: {
@@ -529,6 +646,7 @@ const serviceFormSchemas = {
             type: "object",
             properties: {
               _id: { type: "string" },
+              applicationNo: { type: "string" },
               updatedAt: { type: "string", format: "date-time" },
             },
           },
@@ -552,7 +670,15 @@ const serviceFormSchemas = {
     response: {
       200: {
         type: "object",
-        properties: { success: { type: "boolean" }, message: { type: "string" } },
+        properties: {
+          success: { type: "boolean" },
+          message: { type: "string" },
+          data: {
+            type: "object",
+            properties: { applicationNo: { type: "string" } },
+            additionalProperties: false,
+          },
+        },
       },
     },
   },
@@ -579,6 +705,10 @@ const serviceFormSchemas = {
           success: { type: "boolean" },
           message: { type: "string" },
           deletedCount: { type: "integer" },
+          applicationNos: {
+            type: "array",
+            items: { type: "string" },
+          },
         },
       },
     },
