@@ -2,7 +2,7 @@ import ServiceForm from '../../models/serviceForm.js';
 import { successResponse, errorResponse } from '../../utils/response.util.js';
 
 const statusEnum = ["Approved", "Rejected", "Pending", "Draft", "Processing"];
-const serviceTypeEnum = ["MeterReplacement", "Mutation", "Reconnection", "Tanker"," Disconnection"];
+const serviceTypeEnum = ["MeterReplacement", "Mutation", "Reconnection", "Tanker", "Disconnection", "Address Change", "Mobile Update", "Connection Change", "Meter Size Update"];
 
 // GET /form-services/count
 export const getFormCountByStatus = async (req, reply) => {
