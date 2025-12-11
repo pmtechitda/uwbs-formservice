@@ -72,7 +72,9 @@ const serviceFormSchemas = {
         tanker_quantity: { type: "string" },
 
         old_connection_category: { type: "string" },
+        old_sub_category: { type: "string" },
         new_connection_category: { type: "string" },
+        new_sub_category: { type: "string" },
 
         documents: {
           type: "object",
@@ -481,7 +483,9 @@ const serviceFormSchemas = {
         tanker_quantity: { type: "string" },
 
         old_connection_category: { type: "string" },
+        old_sub_category: { type: "string" },
         new_connection_category: { type: "string" },
+        new_sub_category: { type: "string" },
 
         documents: {
           type: "object",
@@ -598,7 +602,9 @@ const serviceFormSchemas = {
         tanker_time: { type: "string" },
         tanker_quantity: { type: "string" },
         old_connection_category: { type: "string" },
+        old_sub_category: { type: "string" },
         new_connection_category: { type: "string" },
+        new_sub_category: { type: "string" },
         documents: {
           type: "object",
           properties: {

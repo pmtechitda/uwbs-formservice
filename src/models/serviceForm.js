@@ -76,7 +76,9 @@ const serviceFormSchema = new Schema(
         tanker_quantity: { type: String, trim: true },
 
         old_connection_category: { type: String, trim: true },
+        old_sub_category: { type: String, trim: true },
         new_connection_category: { type: String, trim: true },
+        new_sub_category: { type: String, trim: true },
 
         reason: { type: String, trim: true },
         documents: {
