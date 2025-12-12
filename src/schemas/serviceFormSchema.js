@@ -348,11 +348,12 @@ const serviceFormSchemas = {
 
         status: { type: "string", enum: ["All", "Approved", "Rejected", "Pending", "Draft", "Processing"] },
         serviceType: { type: "string", enum: ["All", "MeterReplacement", "Mutation", "Reconnection", "Tanker", "Disconnection", "Address Change", "Mobile Update", "Connection Change", "Meter Size Update"] },
-         applicationNumber: { type: "string" },
+        applicationNumber: { type: "string" },
         q: { type: "string" },
         consumerNumber: { type: "string" },
         mobileNumber: { type: "string", pattern: "^[0-9]{10}$" },
         assignedTo: { type: "string" },
+        assigned_to: { type: "string" },
         submittedBy: { type: "string" },
         is_paid: { type: "string", enum: ["true", "false", "All"] },
         department_id: { type: "string"  },

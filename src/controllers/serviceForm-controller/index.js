@@ -64,6 +64,7 @@ export const getAllServiceForms = async (request, reply) => {
       mobileNumber,
       applicationNumber,
       assignedTo,
+      assigned_to: assignedToTrack,
       submittedBy,
       department_id,
       division_id,
@@ -103,6 +104,29 @@ export const getAllServiceForms = async (request, reply) => {
       { new_mobileNumber: mobileNumber },
     ]);
     if (assignedTo) filter.assignedTo = assignedTo;
+    if (assignedToTrack) {
+      const assignedUser = String(assignedToTrack).trim();
+      if (assignedUser) {
+        const trackDocs = await FormTrack.find(
+          {
+            $or: [
+              { assignedTo: assignedUser, action: { $in: ['Forward', 'Revert'] } },
+              {
+                statusHistory: {
+                  $elemMatch: { assignedTo: assignedUser, action: { $in: ['Forward', 'Revert'] } },
+                },
+              },
+            ],
+          },
+          { form_id: 1 }
+        ).lean();
+        const formIds = trackDocs
+          .map((doc) => doc?.form_id)
+          .filter((id) => id && Types.ObjectId.isValid(id))
+          .map((id) => new Types.ObjectId(id));
+        filter._id = { $in: formIds };
+      }
+    }
     if (submittedBy) filter.submittedBy = submittedBy;
     if (department_id && isValidObjectId(department_id)) filter.department_id = new Types.ObjectId(department_id);
     if (division_id && isValidObjectId(division_id)) filter.division_id = new Types.ObjectId(division_id);
