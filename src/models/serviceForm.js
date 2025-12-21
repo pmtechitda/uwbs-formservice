@@ -5,7 +5,7 @@ const { Schema, Types } = mongoose;
 const serviceFormSchema = new Schema(
     {
 
-         applicationNumber: { type: String, unique: true, required: true },
+        applicationNumber: { type: String, unique: true, required: true },
 
         serviceType: {
             type: String,
