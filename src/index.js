@@ -12,6 +12,7 @@ dotenv.config();
 
 import  swagger  from '@fastify/swagger';
 import  swaggerUI from '@fastify/swagger-ui';
+import sanitizePlugin from "./plugins/sanitize.js";
 const fastify = Fastify({ logger: true,
   ajv: {
         customOptions: {
@@ -25,6 +26,7 @@ const fastify = Fastify({ logger: true,
 async function start() {
   try {
     await fastify.register(authPlugin);
+    await fastify.register(sanitizePlugin);
      await fastify.register(swagger, {
           swagger: {
             info: { title: 'Form Service API', version: '1.0.0' },
