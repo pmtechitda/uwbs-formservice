@@ -9,7 +9,6 @@ const serviceFormSchemas = {
         "serviceType",
         "consumerNumber",
         "current_name",
-        "current_mobileNumber",
         "department_id",
         "departmentName",
         "division_id",
