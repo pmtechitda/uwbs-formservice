@@ -32,7 +32,7 @@ const serviceFormSchemas = {
 
         current_name: { type: "string", minLength: 1 },
         current_fatherName: { type: "string" },
-        current_mobileNumber: { type: "string", pattern: "^[0-9]{10}$" },
+        current_mobileNumber: { type: "string", pattern: "^$|^[0-9]{10}$" },
         current_address: { type: "string" },
         current_district: { type: "string" },
         current_area: { type: "string" },
@@ -127,7 +127,6 @@ const serviceFormSchemas = {
           serviceType: "Service type is required",
           consumerNumber: "Consumer number is required",
           current_name: "Current name is required",
-          current_mobileNumber: "Current mobile number is required",
           department_id: "Department is required",
           departmentName: "Department name is required",
           division_id: "Division is required",
@@ -137,7 +136,7 @@ const serviceFormSchemas = {
           area_type: "Area type is required",
         },
         properties: {
-          current_mobileNumber: "Current mobile number must be 10 digits",
+          current_mobileNumber: "Current mobile number must be 10 digits when provided",
           new_mobileNumber: "New mobile number must be 10 digits",
           consumer_id: "Invalid consumer_id (must be MongoDB ObjectId)",
           department_id: "Invalid department_id (must be MongoDB ObjectId)",
@@ -444,7 +443,7 @@ const serviceFormSchemas = {
 
         current_name: { type: "string" },
         current_fatherName: { type: "string" },
-        current_mobileNumber: { type: "string", pattern: "^[0-9]{10}$" },
+        current_mobileNumber: { type: "string", pattern: "^$|^[0-9]{10}$" },
         current_address: { type: "string" },
         current_district: { type: "string" },
         current_area: { type: "string" },
@@ -568,7 +567,7 @@ const serviceFormSchemas = {
         area_type: { type: "string", enum: ["Urban", "Rural"] },
         current_name: { type: "string" },
         current_fatherName: { type: "string" },
-        current_mobileNumber: { type: "string", pattern: "^[0-9]{10}$" },
+        current_mobileNumber: { type: "string", pattern: "^$|^[0-9]{10}$" },
         current_address: { type: "string" },
         current_district: { type: "string" },
         current_area: { type: "string" },

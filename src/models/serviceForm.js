@@ -30,7 +30,7 @@ const serviceFormSchema = new Schema(
 
         current_mobileNumber: {
             type: String,
-            match: [/^[0-9]{10}$/, "Invalid mobile number"],
+            match: [/^$|^[0-9]{10}$/, "Invalid mobile number"],
         },
 
         current_address: { type: String, trim: true },
