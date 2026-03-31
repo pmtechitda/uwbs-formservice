@@ -2,6 +2,7 @@
 import mongoose from 'mongoose';
 import ServiceForm from '../../models/serviceForm.js';
 import FormTrack from '../../models/formTrack.js';
+import { syncApprovedFormToAdminService } from '../../services/adminServiceApprovalSync.js';
 
 const { Types } = mongoose;
 const isValidObjectId = (id) => Types.ObjectId.isValid(id);
@@ -46,6 +47,22 @@ const recordTrack = async (formDoc, action = 'Update', userId, comment) => {
     },
     { new: true, upsert: true }
   );
+};
+
+const syncApprovedFormOrReply = async (request, reply, formDoc, userId) => {
+  if (formDoc?.status !== 'Approved') return null;
+
+  try {
+    await syncApprovedFormToAdminService(withApplicationNumber(formDoc), { updatedBy: userId });
+    return null;
+  } catch (err) {
+    request.log?.error?.(err);
+    return reply.code(502).send({
+      success: false,
+      message: err?.message || 'Approved service form sync to adminservice failed',
+      data: withApplicationNumber(formDoc),
+    });
+  }
 };
 
 
@@ -261,6 +278,9 @@ export const createServiceForm = async (request, reply) => {
 
     await recordTrack(saved, 'Created', request.user?.id);
 
+    const syncReply = await syncApprovedFormOrReply(request, reply, saved, request.user?.id);
+    if (syncReply) return syncReply;
+
     return reply.code(201).send({ success: true, message: 'Created', data: withApplicationNumber(saved) });
   } catch (err) {
     request.log?.error?.(err);
@@ -295,6 +315,9 @@ export const updateServiceForm = async (request, reply) => {
 
     await recordTrack(updated, 'Update', request.user?.id);
 
+    const syncReply = await syncApprovedFormOrReply(request, reply, updated, request.user?.id);
+    if (syncReply) return syncReply;
+
     return reply.code(200).send({ success: true, message: 'Updated', data: withApplicationNumber(updated) });
   } catch (err) {
     request.log?.error?.(err);
@@ -326,6 +349,9 @@ export const patchServiceForm = async (request, reply) => {
     if (!updated) return reply.code(404).send({ success: false, message: 'Not found' });
 
     await recordTrack(updated, 'Update', request.user?.id);
+
+    const syncReply = await syncApprovedFormOrReply(request, reply, updated, request.user?.id);
+    if (syncReply) return syncReply;
 
     return reply.code(200).send({ success: true, message: 'Patched', data: withApplicationNumber(updated) });
   } catch (err) {

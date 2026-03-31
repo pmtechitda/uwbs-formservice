@@ -4,6 +4,12 @@ import { randomUUID } from 'crypto';
 let channel, replyQueue
 const correlationMap = new Map()
 
+function ensureRpcReady() {
+  if (!channel || !replyQueue) {
+    throw new Error('RPC channel not initialized')
+  }
+}
+
 export async function connectRPC() {
   const conn = await amqp.connect(process.env.RABBITMQ_URI)
   channel = await conn.createChannel()
@@ -12,37 +18,56 @@ export async function connectRPC() {
   channel.consume(
     replyQueue,
     (msg) => {
+      if (!msg) return
       const correlationId = msg.properties.correlationId
-      const resolve = correlationMap.get(correlationId)
-      if (resolve) {
-        resolve(JSON.parse(msg.content.toString()))
+      const pending = correlationMap.get(correlationId)
+      if (pending) {
+        clearTimeout(pending.timeout)
         correlationMap.delete(correlationId)
+        try {
+          pending.resolve(JSON.parse(msg.content.toString()))
+        } catch (err) {
+          pending.reject(err)
+        }
       }
     },
     { noAck: true }
   )
 }
 
-export async function verifyTokenRPC(token) {
+export async function rpcRequest(queue, payload = {}, { timeoutMs = 5000 } = {}) {
+  ensureRpcReady()
+
   return new Promise((resolve, reject) => {
     const correlationId = randomUUID()
-    correlationMap.set(correlationId, resolve)
-
-    channel.sendToQueue(
-      'verify.token.request',
-      Buffer.from(JSON.stringify({ token })),
-      {
-        replyTo: replyQueue,
-        correlationId,
-      }
-    )
-
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       if (correlationMap.has(correlationId)) {
         correlationMap.delete(correlationId)
-        reject(new Error('Token verify timeout'))
+        reject(new Error(`${queue} timeout`))
       }
-    }, 5000)
+    }, timeoutMs)
+
+    correlationMap.set(correlationId, { resolve, reject, timeout })
+
+    try {
+      channel.sendToQueue(
+        queue,
+        Buffer.from(JSON.stringify(payload)),
+        {
+          replyTo: replyQueue,
+          correlationId,
+          contentType: 'application/json',
+        }
+      )
+    } catch (err) {
+      clearTimeout(timeout)
+      correlationMap.delete(correlationId)
+      reject(err)
+    }
   })
+}
+
+export async function verifyTokenRPC(token) {
+  return rpcRequest('verify.token.request', { token }, { timeoutMs: 5000 })
 }
 

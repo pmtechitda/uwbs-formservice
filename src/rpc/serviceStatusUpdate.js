@@ -2,6 +2,7 @@ import amqp from 'amqplib'
 import mongoose from 'mongoose'
 import ServiceForm from '../models/serviceForm.js'
 import FormTrack from '../models/formTrack.js'
+import { syncApprovedFormToAdminService } from '../services/adminServiceApprovalSync.js'
 
 const QUEUE = 'service.status.update.request'
 
@@ -165,6 +166,12 @@ export default async function startServiceStatusConsumer() {
           await recordTrack(doc, 'StatusChange', {
             actedBy: req.updatedBy || req.userId || doc.actedBy,
             comment: req.comment,
+          })
+        }
+
+        if (doc.status === 'Approved') {
+          await syncApprovedFormToAdminService(doc, {
+            updatedBy: req.updatedBy || req.userId || doc.actedBy,
           })
         }
 
