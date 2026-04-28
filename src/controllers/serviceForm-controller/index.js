@@ -6,6 +6,7 @@ import { syncApprovedFormToAdminService } from '../../services/adminServiceAppro
 
 const { Types } = mongoose;
 const isValidObjectId = (id) => Types.ObjectId.isValid(id);
+const isDuplicateKeyError = (err) => err?.code === 11000 || err?.name === 'MongoServerError' && err?.code === 11000;
 const withApplicationNumber = (doc) => {
   if (!doc) return doc;
   const raw = doc.toObject ? doc.toObject() : doc;
@@ -294,6 +295,13 @@ export const createServiceForm = async (request, reply) => {
     if (err.name === 'ValidationError') {
       return reply.code(400).send({ success: false, message: err.message, errors: err.errors });
     }
+    if (isDuplicateKeyError(err)) {
+      return reply.code(409).send({
+        success: false,
+        message: 'Duplicate value rejected by database index',
+        key: err.keyPattern || err.keyValue,
+      });
+    }
     return reply.code(500).send({ success: false, message: 'Server error' });
   }
 };
@@ -329,6 +337,13 @@ export const updateServiceForm = async (request, reply) => {
   } catch (err) {
     request.log?.error?.(err);
     if (err.name === 'ValidationError') return reply.code(400).send({ success: false, message: err.message, errors: err.errors });
+    if (isDuplicateKeyError(err)) {
+      return reply.code(409).send({
+        success: false,
+        message: 'Duplicate value rejected by database index',
+        key: err.keyPattern || err.keyValue,
+      });
+    }
     return reply.code(500).send({ success: false, message: 'Server error' });
   }
 };
@@ -364,6 +379,13 @@ export const patchServiceForm = async (request, reply) => {
   } catch (err) {
     request.log?.error?.(err);
     if (err.name === 'ValidationError') return reply.code(400).send({ success: false, message: err.message, errors: err.errors });
+    if (isDuplicateKeyError(err)) {
+      return reply.code(409).send({
+        success: false,
+        message: 'Duplicate value rejected by database index',
+        key: err.keyPattern || err.keyValue,
+      });
+    }
     return reply.code(500).send({ success: false, message: 'Server error' });
   }
 };
