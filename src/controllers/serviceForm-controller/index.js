@@ -31,15 +31,14 @@ const recordTrack = async (formDoc, action = 'Update', userId, comment) => {
   const uniqueapplicationNumber = formDoc.uniqueapplicationNumber;
 
   await FormTrack.findOneAndUpdate(
-    { form_id: formDoc._id, applicationNumber },
+    { form_id: formDoc._id },
     {
       $setOnInsert: {
         form_id: formDoc._id,
         formName: 'ServiceForm',
-        applicationNumber,
-        uniqueapplicationNumber,
       },
       $set: {
+        applicationNumber,
         status: formDoc.status,
         sub_status: formDoc.sub_status,
         assignedTo: formDoc.assignedTo,

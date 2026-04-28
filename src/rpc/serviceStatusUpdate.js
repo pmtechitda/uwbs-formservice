@@ -65,15 +65,17 @@ async function recordTrack(doc, action = 'StatusChange', { actedBy, comment } = 
   if (actedBy) setPayload.actedBy = actedBy
 
   await FormTrack.findOneAndUpdate(
-    { form_id: doc._id, applicationNumber },
+    { form_id: doc._id },
     {
       $setOnInsert: {
         form_id: doc._id,
         formName: 'ServiceForm',
+      },
+      $set: {
+        ...setPayload,
         applicationNumber,
         uniqueapplicationNumber,
       },
-      $set: setPayload,
       $push: { statusHistory: historyEntry },
     },
     { new: true, upsert: true },
