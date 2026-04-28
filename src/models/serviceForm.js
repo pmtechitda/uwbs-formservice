@@ -6,6 +6,7 @@ const serviceFormSchema = new Schema(
     {
 
         applicationNumber: { type: String, unique: true, required: true },
+        uniqueapplicationNumber: { type: String, required: true },
 
         serviceType: {
             type: String,

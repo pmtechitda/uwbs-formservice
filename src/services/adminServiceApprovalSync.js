@@ -29,6 +29,10 @@ export function buildAdminApprovalSyncPayload(form = {}, { updatedBy } = {}) {
     serviceFormId: normalizeString(form._id),
     applicationNumber:
       normalizeString(form.applicationNumber) || normalizeString(form._id),
+    uniqueapplicationNumber:
+      normalizeString(form.uniqueapplicationNumber) ||
+      normalizeString(form.applicationNumber) ||
+      normalizeString(form._id),
     consumerNumber: normalizeString(form.consumerNumber),
     serviceType: normalizeString(form.serviceType),
     status: normalizeString(form.status),

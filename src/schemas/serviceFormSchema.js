@@ -29,6 +29,7 @@ const serviceFormSchemas = {
         area_type: { type: "string", enum: ["Urban", "Rural"] },
         consumer_id: { type: "string"  },
         consumerNumber: { type: "string", minLength: 1 },
+        uniqueapplicationNumber: { type: "string" },
 
         current_name: { type: "string", minLength: 1 },
         current_fatherName: { type: "string" },
@@ -156,6 +157,7 @@ const serviceFormSchemas = {
             properties: {
               _id: { type: "string"  },
                applicationNumber: { type: "string" },
+              uniqueapplicationNumber: { type: "string" },
               serviceType: { type: "string" },
               consumerNumber: { type: "string" },
               current_name: { type: "string" },
@@ -194,6 +196,7 @@ const serviceFormSchemas = {
             properties: {
               _id: { type: "string" },
                applicationNumber: { type: "string" },
+              uniqueapplicationNumber: { type: "string" },
               serviceType: { type: "string" },
               consumerNumber: { type: "string" },
               consumer_id: { type: "string" },
@@ -228,7 +231,10 @@ const serviceFormSchemas = {
                 anyOf: [
                   {
                     type: "object",
-                    properties: {  applicationNumber: { type: "string" } },
+                    properties: {
+                      applicationNumber: { type: "string" },
+                      uniqueapplicationNumber: { type: "string" },
+                    },
                     additionalProperties: true,
                   },
                   { type: "null" },
@@ -266,6 +272,7 @@ const serviceFormSchemas = {
             type: "object",
             properties: {
                applicationNumber: { type: "string" },
+              uniqueapplicationNumber: { type: "string" },
               form_id: { type: "string" },
               status: { type: "string" },
               sub_status: { type: "string" },
@@ -303,6 +310,7 @@ const serviceFormSchemas = {
                 properties: {
                   _id: { type: "string" },
                    applicationNumber: { type: "string" },
+                  uniqueapplicationNumber: { type: "string" },
                   serviceType: { type: "string" },
                   consumerNumber: { type: "string" },
                   current_name: { type: "string" },
@@ -315,7 +323,10 @@ const serviceFormSchemas = {
                   anyOf: [
                     {
                       type: "object",
-                      properties: {  applicationNumber: { type: "string" } },
+                      properties: {
+                        applicationNumber: { type: "string" },
+                        uniqueapplicationNumber: { type: "string" },
+                      },
                       additionalProperties: true,
                     },
                     { type: "null" },
@@ -347,6 +358,7 @@ const serviceFormSchemas = {
         status: { type: "string", enum: ["All", "Approved", "Rejected", "Pending", "Draft", "Processing"] },
         serviceType: { type: "string", enum: ["All", "MeterReplacement", "Mutation", "Reconnection", "Tanker", "Disconnection", "Address Change", "Mobile Update", "Connection Change", "Meter Size Update"] },
         applicationNumber: { type: "string" },
+        uniqueapplicationNumber: { type: "string" },
         q: { type: "string" },
         consumerNumber: { type: "string" },
         mobileNumber: { type: "string", pattern: "^[0-9]{10}$" },
@@ -386,6 +398,7 @@ const serviceFormSchemas = {
                   properties: {
                     _id: { type: "string" },
                      applicationNumber: { type: "string" },
+                    uniqueapplicationNumber: { type: "string" },
                     serviceType: { type: "string" },
                     consumerNumber: { type: "string" },
                     current_name: { type: "string" },
@@ -440,6 +453,7 @@ const serviceFormSchemas = {
         area_type: { type: "string", enum: ["Urban", "Rural"] },
         consumer_id: { type: "string"  },
         consumerNumber: { type: "string" },
+        uniqueapplicationNumber: { type: "string" },
 
         current_name: { type: "string" },
         current_fatherName: { type: "string" },
@@ -538,6 +552,7 @@ const serviceFormSchemas = {
             properties: {
               _id: { type: "string" },
                applicationNumber: { type: "string" },
+              uniqueapplicationNumber: { type: "string" },
               updatedAt: { type: "string", format: "date-time" },
             },
             additionalProperties: true,
@@ -565,6 +580,7 @@ const serviceFormSchemas = {
         collection_center_id: { type: "string"  },
         collection_center_name: { type: "string" },
         area_type: { type: "string", enum: ["Urban", "Rural"] },
+        uniqueapplicationNumber: { type: "string" },
         current_name: { type: "string" },
         current_fatherName: { type: "string" },
         current_mobileNumber: { type: "string", pattern: "^$|^[0-9]{10}$" },
@@ -652,6 +668,7 @@ const serviceFormSchemas = {
             properties: {
               _id: { type: "string" },
                applicationNumber: { type: "string" },
+              uniqueapplicationNumber: { type: "string" },
               updatedAt: { type: "string", format: "date-time" },
             },
           },
@@ -680,7 +697,10 @@ const serviceFormSchemas = {
           message: { type: "string" },
           data: {
             type: "object",
-            properties: {  applicationNumber: { type: "string" } },
+            properties: {
+              applicationNumber: { type: "string" },
+              uniqueapplicationNumber: { type: "string" },
+            },
             additionalProperties: false,
           },
         },
@@ -711,6 +731,10 @@ const serviceFormSchemas = {
           message: { type: "string" },
           deletedCount: { type: "integer" },
            applicationNumbers: {
+            type: "array",
+            items: { type: "string" },
+          },
+          uniqueapplicationNumbers: {
             type: "array",
             items: { type: "string" },
           },

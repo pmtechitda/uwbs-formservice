@@ -6,7 +6,8 @@ const QUEUE = 'service.track.request';
 const withApplicationNumber = (doc) => {
   if (!doc) return doc;
   const applicationNumber = doc.applicationNumber || String(doc._id || doc.form_id || '');
-  return { ...doc, applicationNumber };
+  const uniqueapplicationNumber = doc.uniqueapplicationNumber || applicationNumber;
+  return { ...doc, applicationNumber, uniqueapplicationNumber };
 };
 
 function buildQuery(req = {}) {
@@ -23,6 +24,7 @@ function buildQuery(req = {}) {
       or.push({ form_id: new mongoose.Types.ObjectId(ref) });
     }
     or.push({ applicationNumber: ref });
+    or.push({ uniqueapplicationNumber: ref });
   }
 
   if (!or.length) return null;

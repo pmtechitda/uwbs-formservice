@@ -10,7 +10,8 @@ const withApplicationNumber = (doc) => {
   if (!doc) return doc;
   const raw = doc.toObject ? doc.toObject() : doc;
   const applicationNumber = raw.applicationNumber || String(raw._id || raw.form_id || '');
-  return { ...raw, applicationNumber };
+  const uniqueapplicationNumber = raw.uniqueapplicationNumber || applicationNumber;
+  return { ...raw, applicationNumber, uniqueapplicationNumber };
 };
 
 // Append a status history entry and keep latest snapshot for tracking UI
@@ -26,6 +27,7 @@ const recordTrack = async (formDoc, action = 'Update', userId, comment) => {
   };
 
   const applicationNumber = formDoc.applicationNumber || String(formDoc._id);
+  const uniqueapplicationNumber = formDoc.uniqueapplicationNumber || applicationNumber;
 
   await FormTrack.findOneAndUpdate(
     { form_id: formDoc._id, applicationNumber },
@@ -34,11 +36,13 @@ const recordTrack = async (formDoc, action = 'Update', userId, comment) => {
         form_id: formDoc._id,
         formName: 'ServiceForm',
         applicationNumber,
+        uniqueapplicationNumber,
       },
       $set: {
         status: formDoc.status,
         sub_status: formDoc.sub_status,
         assignedTo: formDoc.assignedTo,
+        uniqueapplicationNumber,
         action,
         comment,
         actedBy: userId,
@@ -80,6 +84,7 @@ export const getAllServiceForms = async (request, reply) => {
       consumerNumber,
       mobileNumber,
       applicationNumber,
+      uniqueapplicationNumber,
       assignedTo,
       assigned_to: assignedToTrack,
       submittedBy,
@@ -101,12 +106,14 @@ export const getAllServiceForms = async (request, reply) => {
       const regex = new RegExp(q, 'i');
       filter.$or = [
         { applicationNumber: regex },
+        { uniqueapplicationNumber: regex },
         { consumerNumber: regex },
         { current_name: regex },
         { new_name: regex },
       ];
     }
     if (applicationNumber) filter.applicationNumber = applicationNumber;
+    if (uniqueapplicationNumber) filter.uniqueapplicationNumber = uniqueapplicationNumber;
 
     const statusProvided = typeof status !== 'undefined' && status !== null && status !== '';
     if (statusProvided && status !== 'All') {
@@ -271,6 +278,9 @@ export const createServiceForm = async (request, reply) => {
       }
     }
     payload.applicationNumber = `${prefix}${String(uniqueNumber).padStart(7, '0')}`;
+    if (!payload.uniqueapplicationNumber) {
+      payload.uniqueapplicationNumber = payload.applicationNumber;
+    }
     
 
     const doc = new ServiceForm(payload);
@@ -392,7 +402,10 @@ export const deleteServiceForm = async (request, reply) => {
     return reply.code(200).send({
       success: true,
       message: 'Deleted',
-      data: { applicationNumber: deletedWithAppNo.applicationNumber },
+      data: {
+        applicationNumber: deletedWithAppNo.applicationNumber,
+        uniqueapplicationNumber: deletedWithAppNo.uniqueapplicationNumber,
+      },
     });
   } catch (err) {
     request.log?.error?.(err);
@@ -414,8 +427,12 @@ export const bulkDeleteServiceForms = async (request, reply) => {
       return reply.code(400).send({ success: false, message: 'No valid ids provided' });
     }
 
-    const formsToDelete = await ServiceForm.find({ _id: { $in: validIds } }, 'applicationNumber').lean();
+    const formsToDelete = await ServiceForm.find(
+      { _id: { $in: validIds } },
+      'applicationNumber uniqueapplicationNumber'
+    ).lean();
     const applicationNumbers = formsToDelete.map((doc) => withApplicationNumber(doc).applicationNumber);
+    const uniqueapplicationNumbers = formsToDelete.map((doc) => withApplicationNumber(doc).uniqueapplicationNumber);
     const result = await ServiceForm.deleteMany({ _id: { $in: validIds } });
 
     return reply.code(200).send({
@@ -423,6 +440,7 @@ export const bulkDeleteServiceForms = async (request, reply) => {
       message: 'Bulk delete completed',
       deletedCount: result.deletedCount,
       applicationNumbers,
+      uniqueapplicationNumbers,
     });
   } catch (err) {
     request.log?.error?.(err);

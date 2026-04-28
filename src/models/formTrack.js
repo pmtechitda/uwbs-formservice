@@ -38,6 +38,7 @@ const formTrackSchema = new Schema(
   {
     form_id: { type: Types.ObjectId, required: true, index: true , ref: "ServiceForm" },
     applicationNumber: { type: String, required: true, unique: true },
+    uniqueapplicationNumber: { type: String },
     status: { type: String, enum: statusEnum },
     sub_status: { type: String, enum: subStatusEnum },
     assignedTo: { type: String },

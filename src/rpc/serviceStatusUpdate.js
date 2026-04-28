@@ -19,7 +19,13 @@ function buildQuery(req = {}) {
     if (isObjectId(serviceNumber)) {
       return { _id: new mongoose.Types.ObjectId(serviceNumber) }
     }
-    return { applicationNumber: String(serviceNumber) }
+    const ref = String(serviceNumber)
+    return {
+      $or: [
+        { applicationNumber: ref },
+        { uniqueapplicationNumber: ref },
+      ],
+    }
   }
   return null
 }
@@ -46,10 +52,12 @@ async function recordTrack(doc, action = 'StatusChange', { actedBy, comment } = 
   }
 
   const applicationNumber = doc.applicationNumber || String(doc._id)
+  const uniqueapplicationNumber = doc.uniqueapplicationNumber || applicationNumber
   const setPayload = {
     status: doc.status,
     sub_status: doc.sub_status,
     assignedTo: doc.assignedTo,
+    uniqueapplicationNumber,
     action,
   }
 
@@ -63,6 +71,7 @@ async function recordTrack(doc, action = 'StatusChange', { actedBy, comment } = 
         form_id: doc._id,
         formName: 'ServiceForm',
         applicationNumber,
+        uniqueapplicationNumber,
       },
       $set: setPayload,
       $push: { statusHistory: historyEntry },
@@ -160,7 +169,9 @@ export default async function startServiceStatusConsumer() {
         }
 
         const applicationNumber = doc.applicationNumber || String(doc._id)
+        const uniqueapplicationNumber = doc.uniqueapplicationNumber || applicationNumber
         if (!doc.applicationNumber) doc.applicationNumber = applicationNumber
+        if (!doc.uniqueapplicationNumber) doc.uniqueapplicationNumber = uniqueapplicationNumber
 
         if (doc.status && doc.status !== 'Draft') {
           await recordTrack(doc, 'StatusChange', {
@@ -182,6 +193,7 @@ export default async function startServiceStatusConsumer() {
             data: {
               id: doc._id,
               applicationNumber,
+              uniqueapplicationNumber,
               status: doc.status,
               sub_status: doc.sub_status,
               is_paid: doc.is_paid,
