@@ -6,7 +6,7 @@ const QUEUE = 'service.track.request';
 const withApplicationNumber = (doc) => {
   if (!doc) return doc;
   const applicationNumber = doc.applicationNumber || String(doc._id || doc.form_id || '');
-  const uniqueapplicationNumber = doc.uniqueapplicationNumber || applicationNumber;
+  const uniqueapplicationNumber = doc.uniqueapplicationNumber;
   return { ...doc, applicationNumber, uniqueapplicationNumber };
 };
 

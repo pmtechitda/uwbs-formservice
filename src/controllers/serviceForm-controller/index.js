@@ -10,7 +10,7 @@ const withApplicationNumber = (doc) => {
   if (!doc) return doc;
   const raw = doc.toObject ? doc.toObject() : doc;
   const applicationNumber = raw.applicationNumber || String(raw._id || raw.form_id || '');
-  const uniqueapplicationNumber = raw.uniqueapplicationNumber || applicationNumber;
+  const uniqueapplicationNumber = raw.uniqueapplicationNumber;
   return { ...raw, applicationNumber, uniqueapplicationNumber };
 };
 
@@ -27,7 +27,7 @@ const recordTrack = async (formDoc, action = 'Update', userId, comment) => {
   };
 
   const applicationNumber = formDoc.applicationNumber || String(formDoc._id);
-  const uniqueapplicationNumber = formDoc.uniqueapplicationNumber || applicationNumber;
+  const uniqueapplicationNumber = formDoc.uniqueapplicationNumber;
 
   await FormTrack.findOneAndUpdate(
     { form_id: formDoc._id, applicationNumber },
@@ -278,9 +278,6 @@ export const createServiceForm = async (request, reply) => {
       }
     }
     payload.applicationNumber = `${prefix}${String(uniqueNumber).padStart(7, '0')}`;
-    if (!payload.uniqueapplicationNumber) {
-      payload.uniqueapplicationNumber = payload.applicationNumber;
-    }
     
 
     const doc = new ServiceForm(payload);
@@ -432,7 +429,9 @@ export const bulkDeleteServiceForms = async (request, reply) => {
       'applicationNumber uniqueapplicationNumber'
     ).lean();
     const applicationNumbers = formsToDelete.map((doc) => withApplicationNumber(doc).applicationNumber);
-    const uniqueapplicationNumbers = formsToDelete.map((doc) => withApplicationNumber(doc).uniqueapplicationNumber);
+    const uniqueapplicationNumbers = formsToDelete
+      .map((doc) => withApplicationNumber(doc).uniqueapplicationNumber)
+      .filter((value) => typeof value === 'string');
     const result = await ServiceForm.deleteMany({ _id: { $in: validIds } });
 
     return reply.code(200).send({

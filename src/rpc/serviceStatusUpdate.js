@@ -52,7 +52,7 @@ async function recordTrack(doc, action = 'StatusChange', { actedBy, comment } = 
   }
 
   const applicationNumber = doc.applicationNumber || String(doc._id)
-  const uniqueapplicationNumber = doc.uniqueapplicationNumber || applicationNumber
+  const uniqueapplicationNumber = doc.uniqueapplicationNumber
   const setPayload = {
     status: doc.status,
     sub_status: doc.sub_status,
@@ -169,9 +169,8 @@ export default async function startServiceStatusConsumer() {
         }
 
         const applicationNumber = doc.applicationNumber || String(doc._id)
-        const uniqueapplicationNumber = doc.uniqueapplicationNumber || applicationNumber
+        const uniqueapplicationNumber = doc.uniqueapplicationNumber
         if (!doc.applicationNumber) doc.applicationNumber = applicationNumber
-        if (!doc.uniqueapplicationNumber) doc.uniqueapplicationNumber = uniqueapplicationNumber
 
         if (doc.status && doc.status !== 'Draft') {
           await recordTrack(doc, 'StatusChange', {
